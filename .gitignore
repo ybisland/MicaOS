@@ -1,0 +1,62 @@
+# Build directories
+build/
+**/build/
+cmake-build-*/
+out/
+dist/
+
+# CMake / Ninja generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+*.ninja
+.ninja_deps
+.ninja_log
+Makefile
+
+# Embedded toolchain outputs
+*.elf
+*.axf
+*.bin
+*.hex
+*.map
+*.lst
+*.su
+*.obj
+*.o
+*.d
+*.a
+*.lib
+
+# Host test/build outputs
+*.exe
+*.dll
+*.so
+*.gcda
+*.gcno
+*.gcov
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.orig
+
+# Python cache / virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# IDE and local machine files
+.vs/
+.vscode/ipch/
+.vscode/
+*.user
+*.suo
+*.uvguix.*
+
+# Project-local machine configuration
+tests/local_tools.ps1
