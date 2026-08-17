@@ -30,7 +30,7 @@ extern "C" {
  *      cancelling the previous one. Read/write cursors are not moved until
  *      finish() is called.
  *
- * Design notes:
+ * Usage notes:
  *   - Parameter validity is not checked by default; callers must satisfy API
  *     preconditions.
  *   - Define BYTEBUF_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables

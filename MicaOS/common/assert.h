@@ -18,7 +18,7 @@ extern "C" {
  *   3. Use ASSERT() for run-time programming errors such as invalid arguments,
  *      corrupted internal links, or impossible states.
  *
- * Design notes:
+ * Usage notes:
  *   - Requires C99 or later with GNU extensions.
  *     Recommended: C11 for better static_assert messages.
  *   - ASSERT() is controlled by ASSERT_DEBUG. By default it is enabled unless

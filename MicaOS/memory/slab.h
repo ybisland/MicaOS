@@ -22,7 +22,7 @@ extern "C" {
  *   3. Use slab_alloc() to allocate an object.
  *   4. Return objects with slab_free().
  *
- * Design notes:
+ * Usage notes:
  *   - The slab never allocates memory. Storage lifetime is owned by the caller.
  *   - Each slab manages one fixed-size object/block type.
  *   - Parameter validity is not checked by default; callers must satisfy API
@@ -30,7 +30,7 @@ extern "C" {
  *   - A freed object is used internally as a free-list node, so its previous
  *     contents are overwritten after slab_free().
  *
- * Debug:
+ * Diagnostics:
  *   - Define SLAB_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
  *     ASSERT-based parameter, range, alignment, and double-free checks.
  *   - SLAB_ALLOC_FAILED_HOOK_ENABLE is enabled by default. When slab_alloc()
@@ -77,7 +77,7 @@ extern "C" {
  *   task_t *task = (task_t *)slab_alloc(&task_slab);
  *   slab_free(&task_slab, task);
  *
- * Implementation:
+ * Implementation notes:
  *   slab_storage() declares each block as a union of slist_node_t and the user
  *   object type. When a block is free, slab uses it as a free-list node. When
  *   the block is allocated, the caller uses the same storage as the object.

@@ -33,7 +33,7 @@ extern "C" {
  *      read the next packet directly from internal storage. claim() does not
  *      move the read cursor; release() consumes that packet.
  *
- * Design notes:
+ * Usage notes:
  *   - Packet length is stored in a 16-bit internal header. User packet size
  *     must be 1..UINT16_MAX bytes.
  *   - Each packet is stored as one contiguous header + payload block. If the

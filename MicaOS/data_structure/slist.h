@@ -30,7 +30,7 @@ extern "C" {
  *   6. Recover the owner object with slist_entry(), or iterate owner objects
  *      directly with slist_for_each_entry().
  *
- * Design notes:
+ * Usage notes:
  *   - This module requires C99 or later with GNU extensions (uses __typeof__ to
  *     infer types).
  *     Recommended: C11 for better static_assert messages.

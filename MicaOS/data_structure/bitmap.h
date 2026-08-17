@@ -24,7 +24,7 @@ extern "C" {
  *      needed, such as priority maps or flag scanning.
  *   5. Use bitmap_find_first_zero() for simple fixed-ID/resource allocation.
  *
- * Design notes:
+ * Usage notes:
  *   - The bitmap never allocates memory. Storage lifetime is owned by the caller.
  *   - Parameter validity is not checked by default; callers must satisfy API
  *     preconditions.
