@@ -53,10 +53,10 @@ static inline void commit_read(bytebuf_t *bb, uint32_t size)
 
 void bytebuf_init(bytebuf_t *bb, uint8_t *buffer, uint32_t size)
 {
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(buffer != NULL);
-    BYTEBUF_ASSERT(size > 0U);
-    BYTEBUF_ASSERT(size <= (UINT32_MAX / 2U));
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(buffer != NULL);
+    OS_DIAG_ASSERT(size > 0U);
+    OS_DIAG_ASSERT(size <= (UINT32_MAX / 2U));
 
     bb->buffer = buffer;
     bb->size = size;
@@ -65,7 +65,7 @@ void bytebuf_init(bytebuf_t *bb, uint8_t *buffer, uint32_t size)
 
 void bytebuf_reset(bytebuf_t *bb)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
 
     bb->read = 0U;
     bb->write = 0U;
@@ -77,8 +77,8 @@ bool bytebuf_put_u8(bytebuf_t *bb, uint8_t byte)
 {
     bytebuf_idx_t offset;
 
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(bb->buffer != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb->buffer != NULL);
 
     if (bytebuf_space(bb) == 0U) {
         return false;
@@ -100,9 +100,9 @@ bool bytebuf_get_u8(bytebuf_t *bb, uint8_t *byte)
 {
     bytebuf_idx_t offset;
 
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(bb->buffer != NULL);
-    BYTEBUF_ASSERT(byte != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb->buffer != NULL);
+    OS_DIAG_ASSERT(byte != NULL);
 
     if (bytebuf_size(bb) == 0U) {
         return false;
@@ -124,9 +124,9 @@ uint32_t bytebuf_put(bytebuf_t *bb, const uint8_t *data, uint32_t size)
 {
     uint32_t len, offset, first;
 
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(bb->buffer != NULL);
-    BYTEBUF_ASSERT(data != NULL || size == 0U);
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb->buffer != NULL);
+    OS_DIAG_ASSERT(data != NULL || size == 0U);
 
     len = bytebuf_min(size, bytebuf_space(bb));
     if (len == 0U) {
@@ -150,9 +150,9 @@ uint32_t bytebuf_get(bytebuf_t *bb, uint8_t *data, uint32_t size)
 {
     uint32_t len, offset, first;
 
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(bb->buffer != NULL);
-    BYTEBUF_ASSERT(data != NULL || size == 0U);
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb->buffer != NULL);
+    OS_DIAG_ASSERT(data != NULL || size == 0U);
 
     len = bytebuf_min(size, bytebuf_size(bb));
     if (len == 0U) {
@@ -176,9 +176,9 @@ uint32_t bytebuf_peek(bytebuf_t *bb, uint8_t *data, uint32_t size)
 {
     uint32_t len, offset, first;
 
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(bb->buffer != NULL);
-    BYTEBUF_ASSERT(data != NULL || size == 0U);
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb->buffer != NULL);
+    OS_DIAG_ASSERT(data != NULL || size == 0U);
 
     len = bytebuf_min(size, bytebuf_size(bb));
     if (len == 0U) {
@@ -200,7 +200,7 @@ uint32_t bytebuf_skip(bytebuf_t *bb, uint32_t size)
 {
     uint32_t len;
 
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
 
     len = bytebuf_min(size, bytebuf_size(bb));
     commit_read(bb, len);
@@ -210,7 +210,7 @@ uint32_t bytebuf_skip(bytebuf_t *bb, uint32_t size)
 
 void bytebuf_skip_all(bytebuf_t *bb)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
 
     commit_read(bb, bytebuf_size(bb));
 }
@@ -219,9 +219,9 @@ uint32_t bytebuf_put_claim(bytebuf_t *bb, uint8_t **data, uint32_t size)
 {
     uint32_t len, offset;
 
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(bb->buffer != NULL);
-    BYTEBUF_ASSERT(data != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb->buffer != NULL);
+    OS_DIAG_ASSERT(data != NULL);
 
     len = bytebuf_min(size, write_contig_space(bb));
     if (len == 0U) {
@@ -237,7 +237,7 @@ uint32_t bytebuf_put_claim(bytebuf_t *bb, uint8_t **data, uint32_t size)
 
 int bytebuf_put_finish(bytebuf_t *bb, uint32_t size)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
 
     if (size > write_contig_space(bb)) {
         return -1;
@@ -252,9 +252,9 @@ uint32_t bytebuf_get_claim(bytebuf_t *bb, uint8_t **data, uint32_t size)
 {
     uint32_t len, offset;
 
-    BYTEBUF_ASSERT(bb != NULL);
-    BYTEBUF_ASSERT(bb->buffer != NULL);
-    BYTEBUF_ASSERT(data != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb->buffer != NULL);
+    OS_DIAG_ASSERT(data != NULL);
 
     len = bytebuf_min(size, read_contig_size(bb));
     if (len == 0U) {
@@ -270,7 +270,7 @@ uint32_t bytebuf_get_claim(bytebuf_t *bb, uint8_t **data, uint32_t size)
 
 int bytebuf_get_finish(bytebuf_t *bb, uint32_t size)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
 
     if (size > read_contig_size(bb)) {
         return -1;

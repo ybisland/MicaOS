@@ -455,7 +455,7 @@ void bus_on_publish_fail(bus_channel_t *channel);
 默认行为：
 
 ```text
-未定义 NDEBUG：进入 ASSERT 路径，用于开发阶段尽早暴露问题。
+未定义 NDEBUG：进入 `OS_ASSERT` 路径，用于开发阶段尽早暴露问题。
 定义 NDEBUG：默认 hook 直接返回。
 ```
 
@@ -487,10 +487,10 @@ Bus 是 hot path service，默认采用强契约模式，而不是防御式框�
 调试疑似误用时，可开启：
 
 ```c
-#define BUS_DIAGNOSTIC_ENABLE 1
+#define OS_DIAGNOSTIC_ENABLE 1
 ```
 
-开启后，bus 会用 `ASSERT` 检查部分契约错误，例如空指针、ISR 误调用、错误 channel 类型、非法 timeout 等。默认关闭时，这些检查不进入 hot path。
+开启后，bus 会用 `OS_DIAG_ASSERT` 检查部分契约错误，例如空指针、ISR 误调用、错误 channel 类型、非法 timeout 等。默认关闭时，这些检查不进入 hot path。
 
 ## 20. ISR 使用限制
 

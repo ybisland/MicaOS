@@ -51,7 +51,7 @@ extern "C" {
  * For code size and runtime performance, this framework follows a
  * strong-contract model rather than a defensive model. Users must strictly
  * follow the documented contracts. When debugging suspected misuse, define
- * BUS_DIAGNOSTIC_ENABLE to 1 to enable diagnostics for contract violations.
+ * OS_DIAGNOSTIC_ENABLE to 1 to enable diagnostics for contract violations.
  *
  * Runtime contract:
  *   - bus_init() must be called before using bus.
@@ -68,10 +68,10 @@ extern "C" {
  *   - bus_publish() calls bus_on_publish_fail() on EVENT ring full.
  *   - bus_try_publish() returns false on EVENT ring full and does not call the
  *     failure hook.
- *   - The default bus_on_publish_fail() stops in debug builds when NDEBUG is
- *     not defined, and returns without action when NDEBUG is defined. Override
- *     the hook when release builds also need logging, reset, or a custom
- *     fail-fast policy.
+ *   - The default bus_on_publish_fail() stops through OS_ASSERT in debug
+ *     builds when NDEBUG is not defined, and returns without action when
+ *     NDEBUG is defined. Override the hook when release builds also need
+ *     logging, reset, or a custom fail-fast policy.
  *
  * Implementation notes:
  *   - No dynamic memory is used.
@@ -80,10 +80,6 @@ extern "C" {
  *   - Each subscriber owns a channel ready queue. Publish only enqueues ready
  *     channel notifications; payload remains stored in the channel backend.
  */
-
-#ifndef BUS_DIAGNOSTIC_ENABLE
-#define BUS_DIAGNOSTIC_ENABLE 0
-#endif
 
 typedef enum bus_channel_type {
     BUS_CHANNEL_EVENT = 0,
@@ -313,7 +309,7 @@ bool bus_state_read(bus_subscriber_t *subscriber,
 /*
  * Weak publish-failed hook.
  *
- * The default implementation stops in an ASSERT path when NDEBUG is not
+ * The default implementation stops through OS_ASSERT when NDEBUG is not
  * defined. When NDEBUG is defined, the default implementation returns without
  * action. Projects may override this hook to log, reset, or apply a custom
  * publish-failure policy. Use bus_try_publish() for low-value events that may

@@ -37,8 +37,8 @@ extern "C" {
  *   - The list never allocates memory. Node lifetime is owned by the caller.
  *   - Parameter validity is not checked by default; callers must satisfy API
  *     preconditions.
- *   - Define SLIST_DIAGNOSTIC_ENABLE to 1 when debugging list misuse; it enables
- *     ASSERT-based parameter and head/tail consistency checks.
+ *   - Define OS_DIAGNOSTIC_ENABLE to 1 when debugging list misuse; it
+ *     enables parameter and head/tail consistency checks.
  *   - A singly linked node does not know its previous node. Removing a known
  *     node with slist_remove() is O(n); prefer slist_remove_after() when the
  *     previous node is already available.
@@ -119,16 +119,6 @@ typedef struct slist {
     slist_node_t *tail;
 } slist_t;
 
-#ifndef SLIST_DIAGNOSTIC_ENABLE
-#define SLIST_DIAGNOSTIC_ENABLE 0
-#endif
-
-#if SLIST_DIAGNOSTIC_ENABLE
-#define SLIST_ASSERT(cond) ASSERT(cond)
-#else
-#define SLIST_ASSERT(cond) ((void)sizeof(cond))
-#endif
-
 /*
  * Static initializer for an empty list.
  *
@@ -147,7 +137,7 @@ typedef struct slist {
  */
 static inline void slist_init(slist_t *list)
 {
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     list->head = NULL;
     list->tail = NULL;
 }
@@ -161,18 +151,18 @@ static inline void slist_init(slist_t *list)
  */
 static inline void slist_node_init(slist_node_t *node)
 {
-    SLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     node->next = NULL;
 }
 
-#if SLIST_DIAGNOSTIC_ENABLE
+#if OS_DIAGNOSTIC_ENABLE
 /* Validate basic head/tail invariants. */
 static inline void slist_diagnostic_check(const slist_t *list)
 {
-    SLIST_ASSERT(list != NULL);
-    SLIST_ASSERT((list->head == NULL) == (list->tail == NULL));
+    OS_DIAG_ASSERT(list != NULL);
+    OS_DIAG_ASSERT((list->head == NULL) == (list->tail == NULL));
     if (list->tail != NULL) {
-        SLIST_ASSERT(list->tail->next == NULL);
+        OS_DIAG_ASSERT(list->tail->next == NULL);
     }
 }
 #else
@@ -185,21 +175,21 @@ static inline void slist_diagnostic_check(const slist_t *list)
 /* Return true when list contains no user nodes. */
 static inline bool slist_empty(const slist_t *list)
 {
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     return list->head == NULL;
 }
 
 /* Return true when exactly one user node is linked in list. */
 static inline bool slist_has_one_node(const slist_t *list)
 {
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     return (list->head != NULL) && (list->head == list->tail);
 }
 
 /* Return true when two or more user nodes are linked in list. */
 static inline bool slist_has_multiple_nodes(const slist_t *list)
 {
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     return (list->head != NULL) && (list->head != list->tail);
 }
 
@@ -208,8 +198,8 @@ static inline bool slist_has_multiple_nodes(const slist_t *list)
  */
 static inline bool slist_is_head(const slist_t *list, const slist_node_t *node)
 {
-    SLIST_ASSERT(list != NULL);
-    SLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     return list->head == node;
 }
 
@@ -218,8 +208,8 @@ static inline bool slist_is_head(const slist_t *list, const slist_node_t *node)
  */
 static inline bool slist_is_tail(const slist_t *list, const slist_node_t *node)
 {
-    SLIST_ASSERT(list != NULL);
-    SLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     return list->tail == node;
 }
 
@@ -230,7 +220,7 @@ static inline bool slist_is_tail(const slist_t *list, const slist_node_t *node)
  */
 static inline slist_node_t *slist_peek_front(const slist_t *list)
 {
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     return list->head;
 }
 
@@ -241,7 +231,7 @@ static inline slist_node_t *slist_peek_front(const slist_t *list)
  */
 static inline slist_node_t *slist_peek_back(const slist_t *list)
 {
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     return list->tail;
 }
 
@@ -263,8 +253,8 @@ static inline slist_node_t *slist_peek_next(const slist_node_t *node)
  */
 static inline void slist_push_front(slist_t *list, slist_node_t *new_node)
 {
-    SLIST_ASSERT(list != NULL);
-    SLIST_ASSERT(new_node != NULL);
+    OS_DIAG_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(new_node != NULL);
     slist_diagnostic_check(list);
 
     new_node->next = list->head;
@@ -282,8 +272,8 @@ static inline void slist_push_front(slist_t *list, slist_node_t *new_node)
  */
 static inline void slist_push_back(slist_t *list, slist_node_t *new_node)
 {
-    SLIST_ASSERT(list != NULL);
-    SLIST_ASSERT(new_node != NULL);
+    OS_DIAG_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(new_node != NULL);
     slist_diagnostic_check(list);
 
     new_node->next = NULL;
@@ -305,10 +295,10 @@ static inline void slist_insert_after(slist_t *list,
                                       slist_node_t *pos,
                                       slist_node_t *new_node)
 {
-    SLIST_ASSERT(list != NULL);
-    SLIST_ASSERT(pos != NULL);
-    SLIST_ASSERT(new_node != NULL);
-    SLIST_ASSERT(pos != new_node);
+    OS_DIAG_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(pos != NULL);
+    OS_DIAG_ASSERT(new_node != NULL);
+    OS_DIAG_ASSERT(pos != new_node);
     slist_diagnostic_check(list);
 
     new_node->next = pos->next;
@@ -328,7 +318,7 @@ static inline slist_node_t *slist_pop_front(slist_t *list)
 {
     slist_node_t *node;
 
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     slist_diagnostic_check(list);
 
     node = list->head;
@@ -355,7 +345,7 @@ static inline slist_node_t *slist_remove_after(slist_t *list,
 {
     slist_node_t *node;
 
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     slist_diagnostic_check(list);
 
     if (prev == NULL) {
@@ -386,8 +376,8 @@ static inline bool slist_remove(slist_t *list, slist_node_t *node)
 {
     slist_node_t *prev;
 
-    SLIST_ASSERT(list != NULL);
-    SLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     slist_diagnostic_check(list);
 
     if (list->head == node) {
@@ -418,7 +408,7 @@ static inline size_t slist_count(const slist_t *list)
     const slist_node_t *node;
     size_t count = 0;
 
-    SLIST_ASSERT(list != NULL);
+    OS_DIAG_ASSERT(list != NULL);
     for (node = list->head; node != NULL; node = node->next) {
         count++;
     }

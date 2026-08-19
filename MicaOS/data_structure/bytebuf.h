@@ -33,8 +33,8 @@ extern "C" {
  * Usage notes:
  *   - Parameter validity is not checked by default; callers must satisfy API
  *     preconditions.
- *   - Define BYTEBUF_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
- *     ASSERT-based parameter and state checks.
+ *   - Define OS_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
+ *     parameter and state checks.
  *
  * Concurrency:
  *   This module does not provide any concurrency control. Callers in multi-threaded
@@ -117,16 +117,6 @@ typedef struct bytebuf {
     bytebuf_idx_t write_base;
 } bytebuf_t;
 
-#ifndef BYTEBUF_DIAGNOSTIC_ENABLE
-#define BYTEBUF_DIAGNOSTIC_ENABLE 0
-#endif
-
-#if BYTEBUF_DIAGNOSTIC_ENABLE
-#define BYTEBUF_ASSERT(cond) ASSERT(cond)
-#else
-#define BYTEBUF_ASSERT(cond) ((void)sizeof(cond))
-#endif
-
 /*
  * Static initializer.
  *
@@ -156,35 +146,35 @@ void bytebuf_reset(bytebuf_t *bb);
 /* Return the capacity in bytes. */
 static inline uint32_t bytebuf_capacity(const bytebuf_t *bb)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
     return bb->size;
 }
 
 /* Return committed readable bytes. */
 static inline uint32_t bytebuf_size(const bytebuf_t *bb)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
     return bb->write - bb->read;
 }
 
 /* Return writable bytes. */
 static inline uint32_t bytebuf_space(const bytebuf_t *bb)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
     return bb->size - (bb->write - bb->read);
 }
 
 /* Return true when no committed readable bytes are available. */
 static inline bool bytebuf_is_empty(const bytebuf_t *bb)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
     return bb->read == bb->write;
 }
 
 /* Return true when no writable space is available. */
 static inline bool bytebuf_is_full(const bytebuf_t *bb)
 {
-    BYTEBUF_ASSERT(bb != NULL);
+    OS_DIAG_ASSERT(bb != NULL);
     return bb->write == (bb->read + bb->size);
 }
 

@@ -9,7 +9,7 @@ extern "C" {
  * Kernel public API.
  *
  * Users should include this header as the single public kernel entry point.
- * kernel_config.h, task.h, scheduler.h, time.h, eventset.h, sem.h, msgq.h,
+ * config.h, task.h, scheduler.h, time.h, eventset.h, sem.h, msgq.h,
  * pipe.h, and the optional timer.h are split only to keep implementation
  * files small and focused. trace.h is kept separate for projects that enable
  * a trace backend.
@@ -36,7 +36,7 @@ extern "C" {
  *   scheduler_internal.h is private to kernel objects and architecture glue.
  */
 
-#include "kernel_config.h"
+#include "config.h"
 #include "time.h"
 
 #if OS_TIMER_ENABLE

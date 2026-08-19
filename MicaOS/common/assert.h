@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "config.h"
 #include "compiler.h"
 
 /*
@@ -15,14 +16,16 @@ extern "C" {
  *      as structure size, alignment, and configuration constraints.
  *   2. Use BUILD_BUG_ON() or BUILD_BUG_ON_ZERO() when a compile-time check must
  *      appear inside an expression or legacy macro.
- *   3. Use ASSERT() for run-time programming errors such as invalid arguments,
- *      corrupted internal links, or impossible states.
+ *   3. Application code may use ASSERT() for run-time programming errors.
+ *   4. MicaOS source code uses OS_ASSERT() for public API contract
+ *      checks and OS_DIAG_ASSERT() for deeper diagnostics.
  *
  * Usage notes:
  *   - Requires C99 or later with GNU extensions.
  *     Recommended: C11 for better static_assert messages.
- *   - ASSERT() is controlled by ASSERT_DEBUG. By default it is enabled unless
- *     NDEBUG is defined.
+ *   - ASSERT() and OS_ASSERT() are controlled by ASSERT_DEBUG. By default
+ *     they are enabled unless NDEBUG is defined.
+ *   - OS_DIAG_ASSERT() also requires OS_DIAGNOSTIC_ENABLE.
  *   - In release builds, run-time assertions are disabled.
  *   - The default on_assert_failure() handler is weak, so projects may override
  *     it to log, reset, break into a debugger, or enter a fault state.
@@ -32,6 +35,8 @@ extern "C" {
  *   BUILD_BUG_ON_MSG(sizeof(uint32_t) != 4, "uint32_t must be 4 bytes");
  *
  *   ASSERT(ptr != NULL);
+ *   OS_ASSERT(ptr != NULL);
+ *   OS_DIAG_ASSERT(link_is_valid);
  */
 
 /* --------------------------------------------------------------------------
@@ -164,30 +169,28 @@ extern "C" {
  * Run-time assertions
  * -------------------------------------------------------------------------- */
 
-#ifndef ASSERT_DEBUG
-# ifdef NDEBUG
-#  define ASSERT_DEBUG 0
-# else
-#  define ASSERT_DEBUG 1
-# endif
-#endif
-
 #if ASSERT_DEBUG
-# ifndef ASSERT
 __NO_RETURN __WEAK void on_assert_failure(const char *expr,
                                           const char *file,
                                           int line);
-#  define ASSERT(cond)                                          \
+# define OS_ASSERT(cond)                                        \
     do {                                                        \
         if (_UNLIKELY(!(cond))) {                               \
             on_assert_failure(#cond, __FILE__, (int)__LINE__);  \
         }                                                       \
     } while (0)
-# endif
 #else
-# ifndef ASSERT
-#  define ASSERT(cond)      ((void)sizeof(cond))
-# endif
+# define OS_ASSERT(cond) ((void)sizeof(cond))
+#endif
+
+#if OS_DIAGNOSTIC_ENABLE
+# define OS_DIAG_ASSERT(cond) OS_ASSERT(cond)
+#else
+# define OS_DIAG_ASSERT(cond) ((void)sizeof(cond))
+#endif
+
+#ifndef ASSERT
+# define ASSERT(cond) OS_ASSERT(cond)
 #endif
 
 #ifdef __cplusplus

@@ -1,6 +1,6 @@
 #include "task.h"
 #include "scheduler_internal.h"
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "arch/arch_context.h"
 
 #if TASK_STACK_WATERMARK_ENABLE
@@ -15,7 +15,7 @@ void task_init(task_t *task,
                size_t stack_size,
                task_priority_t priority)
 {
-    ASSERT((task != NULL) && (entry != NULL) && (stack != NULL));
+    OS_ASSERT((task != NULL) && (entry != NULL) && (stack != NULL));
 
     task->stack = stack;
     task->stack_size = stack_size;
@@ -52,14 +52,14 @@ task_t *task_current(void)
 
 const char *task_get_name(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
 
     return task->name;
 }
 
 task_priority_t task_get_priority(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
 
     return task->priority;
 }
@@ -69,7 +69,7 @@ task_state_t task_get_state(const task_t *task)
     uint32_t key;
     task_state_t state;
 
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
 
     key = arch_irq_lock();
     state = task->state;
@@ -83,7 +83,7 @@ task_wait_type_t task_get_wait_type(const task_t *task)
     uint32_t key;
     task_wait_type_t wait_type;
 
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
 
     key = arch_irq_lock();
     wait_type = task->wait_type;
@@ -98,7 +98,7 @@ size_t task_get_stack_unused(const task_t *task)
     const uint8_t *stack;
     size_t unused;
 
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
 
     stack = (const uint8_t *)task->stack;
     unused = 0U;
@@ -113,7 +113,7 @@ size_t task_get_stack_unused(const task_t *task)
 
 size_t task_get_stack_used(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
 
     return task->stack_size - task_get_stack_unused(task);
 }
@@ -128,7 +128,7 @@ void task_notify(task_t *task)
 {
     uint32_t key;
 
-    ASSERT((task != NULL) && (task->state != TASK_STATE_TERMINATED));
+    OS_ASSERT((task != NULL) && (task->state != TASK_STATE_TERMINATED));
 
     key = arch_irq_lock();
 
@@ -150,13 +150,13 @@ bool task_notify_wait(os_tick_t timeout)
     bool result;
     task_t *current;
 
-    ASSERT(!arch_in_isr() &&
+    OS_ASSERT(!arch_in_isr() &&
            ((timeout == OS_WAIT_FOREVER) || (timeout <= OS_TICK_MAX_DELAY)));
 
     key = arch_irq_lock();
 
     current = scheduler_current();
-    ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
+    OS_ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
     OS_DIAG_ASSERT((current->wait_type == TASK_WAIT_NONE) &&
                    (current->wait_object == NULL) &&
                    dlist_node_is_detached(&current->sched_node) &&

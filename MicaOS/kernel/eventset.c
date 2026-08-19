@@ -1,6 +1,6 @@
 #include "eventset.h"
 #include "scheduler_internal.h"
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "arch/arch_context.h"
 
 static eventset_bits_t eventset_match_(eventset_bits_t current,
@@ -58,7 +58,7 @@ static eventset_bits_t eventset_wait_(eventset_t *eventset,
     task_t *current;
     eventset_bits_t result;
 
-    ASSERT((eventset != NULL) &&
+    OS_ASSERT((eventset != NULL) &&
            (mask != 0U) &&
            !arch_in_isr() &&
            ((timeout == OS_WAIT_FOREVER) || (timeout <= OS_TICK_MAX_DELAY)));
@@ -72,7 +72,7 @@ static eventset_bits_t eventset_wait_(eventset_t *eventset,
     }
 
     current = scheduler_current();
-    ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
+    OS_ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
     OS_DIAG_ASSERT((current->wait_type == TASK_WAIT_NONE) &&
                    (current->wait_object == NULL) &&
                    dlist_node_is_detached(&current->sched_node) &&
@@ -98,7 +98,7 @@ static eventset_bits_t eventset_wait_(eventset_t *eventset,
 
 void eventset_init(eventset_t *eventset)
 {
-    ASSERT(eventset != NULL);
+    OS_ASSERT(eventset != NULL);
 
     eventset->bits = 0U;
     dlist_init(&eventset->wait_list);
@@ -108,7 +108,7 @@ void eventset_set(eventset_t *eventset, eventset_bits_t bits)
 {
     uint32_t key;
 
-    ASSERT((eventset != NULL) && (bits != 0U));
+    OS_ASSERT((eventset != NULL) && (bits != 0U));
 
     key = arch_irq_lock();
     eventset->bits |= bits;
@@ -120,7 +120,7 @@ void eventset_clear(eventset_t *eventset, eventset_bits_t bits)
 {
     uint32_t key;
 
-    ASSERT((eventset != NULL) && (bits != 0U));
+    OS_ASSERT((eventset != NULL) && (bits != 0U));
 
     key = arch_irq_lock();
     eventset->bits &= ~bits;
@@ -132,7 +132,7 @@ eventset_bits_t eventset_get(eventset_t *eventset)
     uint32_t key;
     eventset_bits_t bits;
 
-    ASSERT(eventset != NULL);
+    OS_ASSERT(eventset != NULL);
 
     key = arch_irq_lock();
     bits = eventset->bits;

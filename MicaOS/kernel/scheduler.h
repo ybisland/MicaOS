@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
-#include "kernel_config.h"
+#include "config.h"
 #include "task.h"
 
 /*

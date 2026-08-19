@@ -117,7 +117,7 @@ static void skip_internal_padding(packetbuf_t *pb)
         }
 
         if (available < PACKETBUF_HEADER_SIZE) {
-            PACKETBUF_ASSERT(false);
+            OS_DIAG_ASSERT(false);
             return;
         }
 
@@ -134,10 +134,10 @@ static void skip_internal_padding(packetbuf_t *pb)
 
 void packetbuf_init(packetbuf_t *pb, uint8_t *buffer, uint32_t size)
 {
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(buffer != NULL);
-    PACKETBUF_ASSERT(size > PACKETBUF_HEADER_SIZE);
-    PACKETBUF_ASSERT(size <= (UINT32_MAX / 2U));
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(buffer != NULL);
+    OS_DIAG_ASSERT(size > PACKETBUF_HEADER_SIZE);
+    OS_DIAG_ASSERT(size <= (UINT32_MAX / 2U));
 
     pb->buffer = buffer;
     pb->size = size;
@@ -146,7 +146,7 @@ void packetbuf_init(packetbuf_t *pb, uint8_t *buffer, uint32_t size)
 
 void packetbuf_reset(packetbuf_t *pb)
 {
-    PACKETBUF_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
 
     pb->read = 0U;
     pb->write = 0U;
@@ -161,8 +161,8 @@ bool packetbuf_is_full(const packetbuf_t *pb)
     uint32_t padding;
     uint32_t offset;
 
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(pb->buffer != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb->buffer != NULL);
 
     return !reserve_layout(pb, 1U, &padding, &offset);
 }
@@ -173,8 +173,8 @@ uint16_t packetbuf_peek_size(packetbuf_t *pb)
     uint32_t available;
     uint16_t length;
 
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(pb->buffer != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb->buffer != NULL);
 
     skip_internal_padding(pb);
     if (packetbuf_is_empty(pb)) {
@@ -185,8 +185,8 @@ uint16_t packetbuf_peek_size(packetbuf_t *pb)
     available = packetbuf_size(pb);
     length = read_u16(&pb->buffer[offset]);
 
-    PACKETBUF_ASSERT(length != 0U);
-    PACKETBUF_ASSERT((uint32_t)length + PACKETBUF_HEADER_SIZE <= available);
+    OS_DIAG_ASSERT(length != 0U);
+    OS_DIAG_ASSERT((uint32_t)length + PACKETBUF_HEADER_SIZE <= available);
 
     return length;
 }
@@ -195,8 +195,8 @@ bool packetbuf_put(packetbuf_t *pb, const void *data, uint16_t size)
 {
     void *payload;
 
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(data != NULL || size == 0U);
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(data != NULL || size == 0U);
 
     payload = packetbuf_reserve(pb, size);
     if (payload == NULL) {
@@ -212,8 +212,8 @@ uint16_t packetbuf_get(packetbuf_t *pb, void *data, uint16_t size)
     const void *payload;
     uint16_t packet_size;
 
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(data != NULL || size == 0U);
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(data != NULL || size == 0U);
 
     payload = packetbuf_claim(pb, &packet_size);
     if (payload == NULL) {
@@ -250,8 +250,8 @@ void *packetbuf_reserve(packetbuf_t *pb, uint16_t size)
     uint32_t padding;
     uint32_t offset;
 
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(pb->buffer != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb->buffer != NULL);
 
     if (pb->put_claim_size != 0U) {
         return NULL;
@@ -273,8 +273,8 @@ int packetbuf_commit(packetbuf_t *pb, uint16_t size)
 {
     uint32_t header_offset;
 
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(pb->buffer != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb->buffer != NULL);
 
     if (pb->put_claim_size == 0U) {
         return -1;
@@ -310,9 +310,9 @@ const void *packetbuf_claim(packetbuf_t *pb, uint16_t *size)
     uint32_t offset;
     uint16_t packet_size;
 
-    PACKETBUF_ASSERT(pb != NULL);
-    PACKETBUF_ASSERT(pb->buffer != NULL);
-    PACKETBUF_ASSERT(size != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb->buffer != NULL);
+    OS_DIAG_ASSERT(size != NULL);
 
     skip_internal_padding(pb);
     if (packetbuf_is_empty(pb)) {
@@ -322,8 +322,8 @@ const void *packetbuf_claim(packetbuf_t *pb, uint16_t *size)
 
     offset = read_offset(pb);
     packet_size = read_u16(&pb->buffer[offset]);
-    PACKETBUF_ASSERT(packet_size != 0U);
-    PACKETBUF_ASSERT((uint32_t)packet_size + PACKETBUF_HEADER_SIZE <=
+    OS_DIAG_ASSERT(packet_size != 0U);
+    OS_DIAG_ASSERT((uint32_t)packet_size + PACKETBUF_HEADER_SIZE <=
                      packetbuf_size(pb));
 
     *size = packet_size;

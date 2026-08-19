@@ -1,6 +1,6 @@
 #include "pipe.h"
 #include "scheduler_internal.h"
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "arch/arch_context.h"
 
 static os_tick_t pipe_remaining_timeout_(os_tick_t deadline)
@@ -100,7 +100,7 @@ static task_t *pipe_current_waiter_(void)
     task_t *current;
 
     current = scheduler_current();
-    ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
+    OS_ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
     OS_DIAG_ASSERT((current->wait_type == TASK_WAIT_NONE) &&
                    (current->wait_object == NULL) &&
                    dlist_node_is_detached(&current->sched_node) &&
@@ -131,7 +131,7 @@ void pipe_timeout_locked(task_t *task)
 
 void pipe_init(pipe_t *pipe, void *buffer, uint16_t size)
 {
-    ASSERT((pipe != NULL) && (buffer != NULL) && (size != 0U));
+    OS_ASSERT((pipe != NULL) && (buffer != NULL) && (size != 0U));
 
     bytebuf_init(&pipe->buf, (uint8_t *)buffer, size);
     pipe->reader_waiter = NULL;
@@ -150,7 +150,7 @@ uint16_t pipe_write(pipe_t *pipe,
     task_t *current;
     bool finite_timeout;
 
-    ASSERT((pipe != NULL) &&
+    OS_ASSERT((pipe != NULL) &&
            ((data != NULL) || (len == 0U)) &&
            (!arch_in_isr() || (timeout == OS_NO_WAIT)) &&
            ((timeout == OS_WAIT_FOREVER) || (timeout <= OS_TICK_MAX_DELAY)));
@@ -223,7 +223,7 @@ uint16_t pipe_read(pipe_t *pipe,
     task_t *current;
     bool finite_timeout;
 
-    ASSERT((pipe != NULL) &&
+    OS_ASSERT((pipe != NULL) &&
            ((data != NULL) || (len == 0U)) &&
            (!arch_in_isr() || (timeout == OS_NO_WAIT)) &&
            ((timeout == OS_WAIT_FOREVER) || (timeout <= OS_TICK_MAX_DELAY)));
@@ -289,7 +289,7 @@ uint16_t pipe_count(pipe_t *pipe)
     uint32_t key;
     uint16_t count;
 
-    ASSERT(pipe != NULL);
+    OS_ASSERT(pipe != NULL);
 
     key = arch_irq_lock();
     count = (uint16_t)bytebuf_size(&pipe->buf);
@@ -303,7 +303,7 @@ uint16_t pipe_space(pipe_t *pipe)
     uint32_t key;
     uint16_t space;
 
-    ASSERT(pipe != NULL);
+    OS_ASSERT(pipe != NULL);
 
     key = arch_irq_lock();
     space = (uint16_t)bytebuf_space(&pipe->buf);
@@ -316,7 +316,7 @@ void pipe_reset(pipe_t *pipe)
 {
     uint32_t key;
 
-    ASSERT(pipe != NULL);
+    OS_ASSERT(pipe != NULL);
 
     key = arch_irq_lock();
     bytebuf_reset(&pipe->buf);

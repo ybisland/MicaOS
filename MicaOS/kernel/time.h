@@ -5,7 +5,7 @@
 #ifndef __cplusplus
 #include <stdbool.h>
 #endif
-#include "kernel_config.h"
+#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {

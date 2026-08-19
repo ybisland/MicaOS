@@ -1,5 +1,5 @@
 #include "scheduler_internal.h"
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "trace.h"
 #include "arch/arch_context.h"
 #include "data_structure/bitmap.h"
@@ -232,7 +232,7 @@ void scheduler_init(void)
 
 void scheduler_add(task_t *task)
 {
-    ASSERT((task != NULL) &&
+    OS_ASSERT((task != NULL) &&
            (task->state == TASK_STATE_CREATED) &&
            (task->priority < SCHED_PRIORITY_LEVELS) &&
            dlist_node_is_detached(&task->sched_node));
@@ -242,7 +242,7 @@ void scheduler_add(task_t *task)
 
 __NO_RETURN void scheduler_start(void)
 {
-    ASSERT(!scheduler_.running);
+    OS_ASSERT(!scheduler_.running);
 
     task_init(&scheduler_.idle_task,
               "idle",
@@ -267,7 +267,7 @@ void scheduler_yield(void)
 {
     uint32_t key;
 
-    ASSERT(!arch_in_isr());
+    OS_ASSERT(!arch_in_isr());
     key = arch_irq_lock();
 
     if (!scheduler_.running) {
@@ -290,7 +290,7 @@ __NO_RETURN void scheduler_exit_current(void)
     uint32_t key;
     task_t *current;
 
-    ASSERT(!arch_in_isr());
+    OS_ASSERT(!arch_in_isr());
     key = arch_irq_lock();
 
     OS_DIAG_ASSERT(scheduler_.running &&

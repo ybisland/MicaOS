@@ -1,14 +1,12 @@
-#ifndef KERNEL_CONFIG_H
-#define KERNEL_CONFIG_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 /*
- * Kernel configuration
+ * MicaOS configuration
  *
- * All kernel-wide options live here. Projects should override these macros
- * from the build system or from a project configuration header included before
- * any kernel header.
- *
- * Every kernel source file must see the same values.
+ * Edit this file when integrating MicaOS without CMake, such as with Keil,
+ * IAR, or another IDE-based build system. Build systems may also override
+ * these macros through compiler definitions.
  *
  * Conventions:
  *   - *_ENABLE options use 0 or 1.
@@ -16,7 +14,21 @@
  *   - Lower numeric priority values represent higher scheduling priorities.
  */
 
-/* Scheduler --------------------------------------------------------------- */
+/* Assertions and diagnostics ---------------------------------------------- */
+
+#ifndef ASSERT_DEBUG
+# ifdef NDEBUG
+#  define ASSERT_DEBUG 0
+# else
+#  define ASSERT_DEBUG 1
+# endif
+#endif
+
+#if (ASSERT_DEBUG != 0) && (ASSERT_DEBUG != 1)
+#error "ASSERT_DEBUG must be 0 or 1"
+#endif
+
+/* Kernel scheduler -------------------------------------------------------- */
 
 /* Number of task priority levels. Valid range: 1..32. */
 #ifndef SCHED_PRIORITY_LEVELS
@@ -46,7 +58,7 @@
 #error "SCHED_IDLE_STACK_SIZE must be 8-byte aligned"
 #endif
 
-/* Optional kernel features ------------------------------------------------ */
+/* Optional features ------------------------------------------------------- */
 
 /* Enable soft timer support. Disabled by default so os_tick_advance() stays minimal. */
 #ifndef OS_TIMER_ENABLE
@@ -58,11 +70,12 @@
 #endif
 
 /*
- * Enable internal kernel diagnostic assertions.
+ * Enable detailed MicaOS diagnostic assertions.
  *
- * Public API contract checks should stay as normal ASSERT checks.
- * This switch is for OS-internal consistency checks used while developing and
- * testing the kernel itself.
+ * OS_ASSERT checks public API misuse in debug builds. This switch enables
+ * deeper contract and consistency checks in data structures, services, and
+ * kernel internals while debugging difficult bugs. It has an effect only when
+ * ASSERT_DEBUG is 1.
  */
 #ifndef OS_DIAGNOSTIC_ENABLE
 #define OS_DIAGNOSTIC_ENABLE 0
@@ -111,4 +124,14 @@
 #error "OS_TRACE_ENABLE must be 0 or 1"
 #endif
 
-#endif /* KERNEL_CONFIG_H */
+/* Memory policy ----------------------------------------------------------- */
+
+#ifndef SLAB_ALLOC_FAILED_HOOK_ENABLE
+#define SLAB_ALLOC_FAILED_HOOK_ENABLE 1
+#endif
+
+#if (SLAB_ALLOC_FAILED_HOOK_ENABLE != 0) && (SLAB_ALLOC_FAILED_HOOK_ENABLE != 1)
+#error "SLAB_ALLOC_FAILED_HOOK_ENABLE must be 0 or 1"
+#endif
+
+#endif /* CONFIG_H */

@@ -12,7 +12,7 @@
 2. 根据目标 CPU 选择并编译一个架构端口。
 3. 确保 `PendSV_Handler` 使用 MicaOS 提供的实现。
 4. 在系统 tick 中断里调用 `os_tick_advance()`。
-5. 配置 `kernel_config.h` 里的内核选项。
+5. 配置 `config.h` 里的 MicaOS 选项。
 6. 创建任务、加入调度器、调用 `scheduler_start()`。
 
 普通应用代码不需要直接调用 `arch_context_init()`、`arch_context_start()` 或其他架构层函数。这些接口由 task 和 scheduler 模块内部使用。
@@ -77,12 +77,12 @@ void SysTick_Handler(void)
 
 tick 周期由你的工程决定。常见选择是 1 ms 一次，此时 `task_delay(10)` 表示大约延时 10 ms。
 
-## 内核配置
+## MicaOS 配置
 
-内核配置集中在：
+MicaOS 全局配置集中在：
 
 ```c
-#include "kernel/kernel_config.h"
+#include "config.h"
 ```
 
 你可以用编译选项覆盖配置，例如：
@@ -104,7 +104,7 @@ tick 周期由你的工程决定。常见选择是 1 ms 一次，此时 `task_de
 | `SCHED_PRIORITY_LEVELS` | 任务优先级数量，范围 `1..32`，数字越小优先级越高 |
 | `SCHED_IDLE_STACK_SIZE` | OS 内部 idle task 栈大小，单位 byte，必须 8 字节对齐 |
 | `OS_TIMER_ENABLE` | 是否启用 soft timer |
-| `OS_DIAGNOSTIC_ENABLE` | 是否启用 OS 内部诊断断言 |
+| `OS_DIAGNOSTIC_ENABLE` | 是否启用 MicaOS 详细诊断断言 |
 | `TASK_STACK_WATERMARK_ENABLE` | 是否启用任务栈水位估算 |
 | `OS_TRACE_ENABLE` | 是否启用通用 trace hook |
 
@@ -288,7 +288,7 @@ header-only 模块如 `dlist.h`、`slist.h`、`bitmap.h` 不需要单独编译�
 
 - `MicaOS/` 已加入 include path。
 - 用户代码包含 `kernel/kernel.h`。
-- 所有 MicaOS 源文件看到同一套 `kernel_config.h` 配置。
+- 所有 MicaOS 源文件看到同一套 `config.h` 配置。
 - 只编译了一个 `arch_context.c`。
 - 向量表中的 `PendSV_Handler` 来自 MicaOS。
 - SysTick 或其他周期中断调用了 `os_tick_advance()`。

@@ -2,7 +2,7 @@
 
 #if OS_TIMER_ENABLE
 
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "scheduler_internal.h"
 #include "arch/arch_context.h"
 
@@ -77,7 +77,7 @@ void timer_init(soft_timer_t *timer,
                 timer_callback_t callback,
                 void *arg)
 {
-    ASSERT((timer != NULL) && (callback != NULL));
+    OS_ASSERT((timer != NULL) && (callback != NULL));
 
     dlist_init(&timer->node);
     timer->expiry = 0U;
@@ -93,7 +93,7 @@ void timer_start(soft_timer_t *timer,
 {
     uint32_t key;
 
-    ASSERT((timer != NULL) &&
+    OS_ASSERT((timer != NULL) &&
            (timer->callback != NULL) &&
            (delay != 0U) &&
            (delay <= OS_TICK_MAX_DELAY) &&
@@ -120,7 +120,7 @@ void timer_stop(soft_timer_t *timer)
 {
     uint32_t key;
 
-    ASSERT(timer != NULL);
+    OS_ASSERT(timer != NULL);
 
     key = arch_irq_lock();
 
@@ -140,7 +140,7 @@ bool timer_is_running(const soft_timer_t *timer)
     uint32_t key;
     bool running;
 
-    ASSERT(timer != NULL);
+    OS_ASSERT(timer != NULL);
 
     key = arch_irq_lock();
     running = timer->running;

@@ -41,3 +41,8 @@ MicaOS 是一个面向低成本 32 位 MCU 的小型静态 OS。它不依赖动�
   `TASK_STACK_WATERMARK_ENABLE=0`。
 - `timer/watermark`：soft timer 和任务栈水位估算开启。
 - `Kernel + bus`：在 `Kernel only` 基础上加入 `service/bus/bus.c`。
+
+## TODO
+- 支持更多Trace Backend
+- CMAKE
+- Skills

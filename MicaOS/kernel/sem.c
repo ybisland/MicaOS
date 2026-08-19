@@ -1,11 +1,11 @@
 #include "sem.h"
 #include "scheduler_internal.h"
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "arch/arch_context.h"
 
 void sem_init(sem_t *sem, uint16_t initial, uint16_t limit)
 {
-    ASSERT((sem != NULL) && (limit != 0U) && (initial <= limit));
+    OS_ASSERT((sem != NULL) && (limit != 0U) && (initial <= limit));
 
     sem->count = initial;
     sem->limit = limit;
@@ -18,7 +18,7 @@ void sem_give(sem_t *sem)
     dlist_node_t *node;
     task_t *task;
 
-    ASSERT(sem != NULL);
+    OS_ASSERT(sem != NULL);
 
     key = arch_irq_lock();
 
@@ -46,7 +46,7 @@ bool sem_take(sem_t *sem, os_tick_t timeout)
     uint32_t key;
     task_t *current;
 
-    ASSERT((sem != NULL) &&
+    OS_ASSERT((sem != NULL) &&
            !arch_in_isr() &&
            ((timeout == OS_WAIT_FOREVER) || (timeout <= OS_TICK_MAX_DELAY)));
 
@@ -64,7 +64,7 @@ bool sem_take(sem_t *sem, os_tick_t timeout)
     }
 
     current = scheduler_current();
-    ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
+    OS_ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
     OS_DIAG_ASSERT((current->wait_type == TASK_WAIT_NONE) &&
                    (current->wait_object == NULL) &&
                    dlist_node_is_detached(&current->sched_node) &&

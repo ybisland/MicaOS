@@ -1,6 +1,6 @@
 #include "time.h"
 #include "scheduler_internal.h"
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "arch/arch_context.h"
 
 /**
@@ -169,12 +169,12 @@ void task_delay(os_tick_t ticks)
         return;
     }
 
-    ASSERT(!arch_in_isr() && (ticks <= OS_TICK_MAX_DELAY));
+    OS_ASSERT(!arch_in_isr() && (ticks <= OS_TICK_MAX_DELAY));
 
     key = arch_irq_lock();
 
     current = scheduler_current();
-    ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
+    OS_ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
     OS_DIAG_ASSERT((current->wait_type == TASK_WAIT_NONE) &&
                    (current->wait_object == NULL) &&
                    dlist_node_is_detached(&current->sched_node) &&

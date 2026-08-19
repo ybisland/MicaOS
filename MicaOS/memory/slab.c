@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#if SLAB_DIAGNOSTIC_ENABLE
+#if OS_DIAGNOSTIC_ENABLE
 /* Check if the block belongs to the slab and points to a valid block boundary. */
 static bool slab_contains_block_(const slab_t *slab, const void *block)
 {
@@ -29,11 +29,11 @@ static bool slab_block_is_free_(const slab_t *slab, const void *block)
 
 static void slab_check_(const slab_t *slab)
 {
-    SLAB_ASSERT(slab != NULL);
-    SLAB_ASSERT(slab->buffer != NULL);
-    SLAB_ASSERT(slab->block_size >= sizeof(slist_node_t));
-    SLAB_ASSERT(slab->block_count > 0U);
-    SLAB_ASSERT(slab->free_count <= slab->block_count);
+    OS_DIAG_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(slab->buffer != NULL);
+    OS_DIAG_ASSERT(slab->block_size >= sizeof(slist_node_t));
+    OS_DIAG_ASSERT(slab->block_count > 0U);
+    OS_DIAG_ASSERT(slab->free_count <= slab->block_count);
 }
 #else
 static void slab_check_(const slab_t *slab)
@@ -47,10 +47,10 @@ void slab_init_(slab_t *slab, const char *name, void *buffer, size_t block_size,
     uint8_t *block;
     size_t i;
 
-    SLAB_ASSERT(slab != NULL);
-    SLAB_ASSERT(buffer != NULL);
-    SLAB_ASSERT(block_size >= sizeof(slist_node_t));
-    SLAB_ASSERT(block_count > 0U);
+    OS_DIAG_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(buffer != NULL);
+    OS_DIAG_ASSERT(block_size >= sizeof(slist_node_t));
+    OS_DIAG_ASSERT(block_count > 0U);
 
     slab->name = name;
     slab->buffer = buffer;
@@ -87,10 +87,10 @@ void *slab_alloc(slab_t *slab)
 void slab_free(slab_t *slab, void *block)
 {
     slab_check_(slab);
-    SLAB_ASSERT(block != NULL);
-#if SLAB_DIAGNOSTIC_ENABLE
-    SLAB_ASSERT(slab_contains_block_(slab, block));
-    SLAB_ASSERT(!slab_block_is_free_(slab, block));
+    OS_DIAG_ASSERT(block != NULL);
+#if OS_DIAGNOSTIC_ENABLE
+    OS_DIAG_ASSERT(slab_contains_block_(slab, block));
+    OS_DIAG_ASSERT(!slab_block_is_free_(slab, block));
 #endif
 
     slist_push_front(&slab->free_list, (slist_node_t *)block);
@@ -100,7 +100,7 @@ void slab_free(slab_t *slab, void *block)
 __NO_RETURN __WEAK void slab_alloc_failed(const slab_t *slab)
 {
     (void)slab;
-    ASSERT(false);
+    OS_ASSERT(false);
 
     for (;;) {
     }

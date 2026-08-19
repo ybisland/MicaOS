@@ -1,6 +1,6 @@
 #include "msgq.h"
 #include "scheduler_internal.h"
-#include "kernel_debug.h"
+#include "common/assert.h"
 #include "arch/arch_context.h"
 
 #include <string.h>
@@ -66,7 +66,7 @@ static os_tick_t msgq_remaining_timeout_(os_tick_t deadline)
 
 void msgq_init(msgq_t *q, void *buffer, uint16_t msg_size, uint16_t capacity)
 {
-    ASSERT((q != NULL) &&
+    OS_ASSERT((q != NULL) &&
            (buffer != NULL) &&
            (msg_size != 0U) &&
            (capacity != 0U));
@@ -92,7 +92,7 @@ bool msgq_send(msgq_t *q, const void *msg, os_tick_t timeout)
     os_tick_t wait_ticks;
     bool finite_timeout;
 
-    ASSERT((q != NULL) &&
+    OS_ASSERT((q != NULL) &&
            (msg != NULL) &&
            (!arch_in_isr() || (timeout == OS_NO_WAIT)) &&
            ((timeout == OS_WAIT_FOREVER) || (timeout <= OS_TICK_MAX_DELAY)));
@@ -133,7 +133,7 @@ bool msgq_send(msgq_t *q, const void *msg, os_tick_t timeout)
 
         // otherwise, block the task, put it into send_wait_list, and start a timeout if needed
         current = scheduler_current();
-        ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
+        OS_ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
         OS_DIAG_ASSERT((current->wait_type == TASK_WAIT_NONE) &&
                        (current->wait_object == NULL) &&
                        dlist_node_is_detached(&current->sched_node) &&
@@ -174,7 +174,7 @@ bool msgq_recv(msgq_t *q, void *msg, os_tick_t timeout)
     os_tick_t wait_ticks;
     bool finite_timeout;
 
-    ASSERT((q != NULL) &&
+    OS_ASSERT((q != NULL) &&
            (msg != NULL) &&
            (!arch_in_isr() || (timeout == OS_NO_WAIT)) &&
            ((timeout == OS_WAIT_FOREVER) || (timeout <= OS_TICK_MAX_DELAY)));
@@ -215,7 +215,7 @@ bool msgq_recv(msgq_t *q, void *msg, os_tick_t timeout)
 
         // otherwise, block the task, put it into recv_wait_list, and start a timeout if needed
         current = scheduler_current();
-        ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
+        OS_ASSERT((current != NULL) && (current->state == TASK_STATE_RUNNING));
         OS_DIAG_ASSERT((current->wait_type == TASK_WAIT_NONE) &&
                        (current->wait_object == NULL) &&
                        dlist_node_is_detached(&current->sched_node) &&
@@ -249,7 +249,7 @@ uint16_t msgq_count(msgq_t *q)
     uint32_t key;
     uint16_t count;
 
-    ASSERT(q != NULL);
+    OS_ASSERT(q != NULL);
 
     key = arch_irq_lock();
     count = q->count;
@@ -263,7 +263,7 @@ uint16_t msgq_space(msgq_t *q)
     uint32_t key;
     uint16_t space;
 
-    ASSERT(q != NULL);
+    OS_ASSERT(q != NULL);
 
     key = arch_irq_lock();
     space = (uint16_t)(q->capacity - q->count);

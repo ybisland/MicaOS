@@ -1,7 +1,7 @@
 #ifndef OS_TRACE_H
 #define OS_TRACE_H
 
-#include "kernel_config.h"
+#include "config.h"
 #include "task.h"
 
 #ifdef __cplusplus

@@ -30,7 +30,7 @@ MicaOS 面向低成本 32 位 MCU，核心目标是简单、静态、可预测�
 
 ### 内核配置
 
-内核级配置集中在 `kernel_config.h`。项目可以通过构建选项统一覆盖这些宏，确保所有内核源码看到同一份配置。
+MicaOS 全局配置集中在 `config.h`。项目可以直接修改该文件，也可以通过构建选项统一覆盖这些宏，确保所有 MicaOS 源码看到同一份配置。
 
 常用配置：
 
@@ -49,7 +49,7 @@ MicaOS 面向低成本 32 位 MCU，核心目标是简单、静态、可预测�
 - `SCHED_PRIORITY_LEVELS`：任务优先级数量，范围是 1..32。数字越小优先级越高。
 - `SCHED_IDLE_STACK_SIZE`：OS 内部 idle task 的栈大小，单位是字节，必须 8 字节对齐。
 - `OS_TIMER_ENABLE`：是否启用 soft timer。默认关闭，让 `os_tick_advance()` 保持短小。
-- `OS_DIAGNOSTIC_ENABLE`：是否启用 OS 内部一致性诊断断言，默认关闭。
+- `OS_DIAGNOSTIC_ENABLE`：是否启用 MicaOS 详细诊断断言，默认关闭。
 - `TASK_STACK_WATERMARK_ENABLE`：是否启用任务栈水位估算。默认关闭。
 - `TASK_STACK_FILL_PATTERN`：栈水位估算使用的填充值，默认 `0xA5`。
 - `OS_TRACE_ENABLE`：是否启用通用 trace hook。默认关闭。
@@ -927,22 +927,97 @@ ISR 中只能使用 `timeout == OS_NO_WAIT` 的非阻塞 msgq 调用。
 
 ## OS 调试
 
-OS 调试分成三层：诊断断言、任务状态观察、trace hook。
+MicaOS 的调试设计分成两级诊断，再配合任务状态观察、栈水位和 trace hook 使用。
 
-### 调试开关
+### 调试模型
 
-常用调试开关都在 `kernel_config.h` 中：
+MicaOS 不是防御式框架，而是强契约框架。用户需要严格遵守 API 文档中的参数、上下文和并发约束。
+这样做的目的是减少发布版本中的代码体积和运行时开销。
+
+调试阶段建议通过断言尽早暴露误用；发布版本关闭断言后，错误参数不会被完整防御。
+因此，如果程序在 Debug 中触发断言，应优先修正调用方式，而不是在业务代码中绕过断言。
+
+### 两级诊断
+
+**Level 1：公共 API 契约检查**
+
+Level 1 用于检查最常见、最直接的 API 误用，例如：
+
+- 传入 `NULL` 指针。
+- 在 ISR 中调用禁止阻塞的 API。
+- timeout 参数超过允许范围。
+- 初始化参数不合法。
+
+MicaOS 源码内部使用 `OS_ASSERT()` 做这一级检查。它受 `ASSERT_DEBUG` 控制：
 
 ```c
+#define ASSERT_DEBUG 1
+```
+
+默认情况下，未定义 `NDEBUG` 时 `ASSERT_DEBUG` 为 1；定义 `NDEBUG` 后为 0。
+也就是说，普通 Debug 构建会启用 Level 1，Release 构建会关闭 Level 1。
+
+应用代码如果需要自己的断言，可以继续使用 `ASSERT()`。它和 `OS_ASSERT()` 使用同一个底层失败处理函数。
+
+**Level 2：详细诊断检查**
+
+Level 2 用于定位更隐蔽的问题，例如：
+
+- 链表节点是否处于正确状态。
+- 任务等待状态是否和等待对象一致。
+- 数据结构内部链接是否符合预期。
+- service 模块的更深层契约是否被破坏。
+
+MicaOS 使用 `OS_DIAG_ASSERT()` 做这一级检查。它默认关闭，需要同时满足：
+
+```c
+#define ASSERT_DEBUG 1
+#define OS_DIAGNOSTIC_ENABLE 1
+```
+
+Level 2 会增加代码体积，并可能影响 hot path 性能。建议只在定位复杂问题时打开，
+问题定位完成后再关闭。
+
+### 断言失败处理
+
+断言失败后会调用 weak 函数 `on_assert_failure()`。用户可以在自己的工程中重写它，
+用于打印表达式、文件名和行号，然后停机、复位或进入调试器。
+
+示例：
+
+```c
+void on_assert_failure(const char *expr, const char *file, int line)
+{
+    debug_log("ASSERT: %s %s:%d", expr, file, line);
+
+    __disable_irq();
+    for (;;) {
+        __BKPT(0);
+    }
+}
+```
+
+如果没有日志系统，也可以先只停在断点处，通过调试器查看 `expr`、`file` 和 `line`。
+
+### 推荐诊断流程
+
+遇到问题时，建议按下面顺序排查：
+
+1. 使用 Debug 构建，保持 `ASSERT_DEBUG=1`。
+2. 重写 `on_assert_failure()`，确保断言失败时能看到表达式、文件和行号。
+3. 如果 Level 1 没有定位到问题，再打开 `OS_DIAGNOSTIC_ENABLE=1`。
+4. 如果怀疑任务栈不足，打开 `TASK_STACK_WATERMARK_ENABLE=1`，查看栈水位。
+5. 如果怀疑调度顺序、阻塞唤醒或任务状态异常，打开 `OS_TRACE_ENABLE=1` 并实现 trace hook。
+6. 问题定位后，关闭不需要的诊断开关，重新评估代码体积和运行时开销。
+
+常用调试开关都在 `config.h` 中：
+
+```c
+#define ASSERT_DEBUG 1
 #define OS_DIAGNOSTIC_ENABLE 1
 #define TASK_STACK_WATERMARK_ENABLE 1
 #define OS_TRACE_ENABLE 1
 ```
-
-建议开发阶段按需打开，发布版本按实际开销关闭。
-
-公共 API 的参数契约仍使用普通 `ASSERT` 检查，用于尽早暴露用户误用。
-`OS_DIAGNOSTIC_ENABLE` 只控制 OS 内部一致性检查，这些检查主要用于内核开发和测试阶段。
 
 ### 任务状态观察
 

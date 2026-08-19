@@ -40,8 +40,8 @@ extern "C" {
  *   - The list never allocates memory. Node lifetime is owned by the caller.
  *   - Parameter validity is not checked by default; callers must satisfy API
  *     preconditions.
- *   - Define DLIST_DIAGNOSTIC_ENABLE to 1 when debugging list misuse; it enables
- *     ASSERT-based parameter and link checks.
+ *   - Define OS_DIAGNOSTIC_ENABLE to 1 when debugging list misuse; it
+ *     enables parameter and link checks.
  *
  * Concurrency:
  *   This module does not provide any concurrency control. Callers in multi-threaded
@@ -119,16 +119,6 @@ typedef struct dlist_node {
 } dlist_node_t;
 typedef dlist_node_t dlist_t;
 
-#ifndef DLIST_DIAGNOSTIC_ENABLE
-#define DLIST_DIAGNOSTIC_ENABLE 0
-#endif
-
-#if DLIST_DIAGNOSTIC_ENABLE
-#define DLIST_ASSERT(cond) ASSERT(cond)
-#else
-#define DLIST_ASSERT(cond) ((void)sizeof(cond))
-#endif
-
 /*
  * Static initializer
  *
@@ -150,7 +140,7 @@ typedef dlist_node_t dlist_t;
  */
 static inline void dlist_init(dlist_node_t *node)
 {
-    DLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     node->next = node;
     node->prev = node;
 }
@@ -163,7 +153,7 @@ static inline void dlist_init(dlist_node_t *node)
  */
 static inline bool dlist_node_is_detached(const dlist_node_t *node)
 {
-    DLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     return (node->next == node) && (node->prev == node);
 }
 
@@ -174,21 +164,21 @@ static inline bool dlist_node_is_detached(const dlist_node_t *node)
  */
 static inline bool dlist_empty(const dlist_t *head)
 {
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     return dlist_node_is_detached(head);
 }
 
 /* Return true when exactly one user node is linked in head. */
 static inline bool dlist_has_one_node(const dlist_t *head)
 {
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     return (head->next != head) && (head->next == head->prev);
 }
 
 /* Return true when two or more user nodes are linked in head. */
 static inline bool dlist_has_multiple_nodes(const dlist_t *head)
 {
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     return (head->next != head) && (head->next != head->prev);
 }
 
@@ -200,8 +190,8 @@ static inline bool dlist_has_multiple_nodes(const dlist_t *head)
  */
 static inline bool dlist_is_head(const dlist_t *head, const dlist_node_t *node)
 {
-    DLIST_ASSERT(head != NULL);
-    DLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     return head->next == node;
 }
 
@@ -213,8 +203,8 @@ static inline bool dlist_is_head(const dlist_t *head, const dlist_node_t *node)
  */
 static inline bool dlist_is_tail(const dlist_t *head, const dlist_node_t *node)
 {
-    DLIST_ASSERT(head != NULL);
-    DLIST_ASSERT(node != NULL);
+    OS_DIAG_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(node != NULL);
     return head->prev == node;
 }
 
@@ -225,7 +215,7 @@ static inline bool dlist_is_tail(const dlist_t *head, const dlist_node_t *node)
  */
 static inline dlist_node_t *dlist_peek_front(const dlist_t *head)
 {
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     return dlist_empty(head) ? NULL : head->next;
 }
 
@@ -236,7 +226,7 @@ static inline dlist_node_t *dlist_peek_front(const dlist_t *head)
  */
 static inline dlist_node_t *dlist_peek_back(const dlist_t *head)
 {
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     return dlist_empty(head) ? NULL : head->prev;
 }
 
@@ -248,7 +238,7 @@ static inline dlist_node_t *dlist_peek_back(const dlist_t *head)
 static inline dlist_node_t *dlist_peek_next(const dlist_t *head,
                                             const dlist_node_t *node)
 {
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     return (node == NULL || dlist_is_tail(head, node)) ? NULL : node->next;
 }
 
@@ -260,29 +250,29 @@ static inline dlist_node_t *dlist_peek_next(const dlist_t *head,
 static inline dlist_node_t *dlist_peek_prev(const dlist_t *head,
                                             const dlist_node_t *node)
 {
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     return (node == NULL || dlist_is_head(head, node)) ? NULL : node->prev;
 }
 
-#if DLIST_DIAGNOSTIC_ENABLE
+#if OS_DIAGNOSTIC_ENABLE
 /* Validate adjacent links before insertion. */
 static inline void dlist_diagnostic_check_links(const dlist_node_t *prev,
                                                 const dlist_node_t *next)
 {
-    DLIST_ASSERT(prev != NULL);
-    DLIST_ASSERT(next != NULL);
-    DLIST_ASSERT(prev->next == next);
-    DLIST_ASSERT(next->prev == prev);
+    OS_DIAG_ASSERT(prev != NULL);
+    OS_DIAG_ASSERT(next != NULL);
+    OS_DIAG_ASSERT(prev->next == next);
+    OS_DIAG_ASSERT(next->prev == prev);
 }
 
 /* Validate that entry's neighbor links are consistent before deletion. */
 static inline void dlist_diagnostic_check_entry(const dlist_node_t *entry)
 {
-    DLIST_ASSERT(entry != NULL);
-    DLIST_ASSERT(entry->next != NULL);
-    DLIST_ASSERT(entry->prev != NULL);
-    DLIST_ASSERT(entry->next->prev == entry);
-    DLIST_ASSERT(entry->prev->next == entry);
+    OS_DIAG_ASSERT(entry != NULL);
+    OS_DIAG_ASSERT(entry->next != NULL);
+    OS_DIAG_ASSERT(entry->prev != NULL);
+    OS_DIAG_ASSERT(entry->next->prev == entry);
+    OS_DIAG_ASSERT(entry->prev->next == entry);
 }
 #else
 static inline void dlist_diagnostic_check_links(const dlist_node_t *prev,
@@ -315,11 +305,11 @@ static inline void dlist_diagnostic_check_entry(const dlist_node_t *entry)
  */
 static inline void dlist_push_front(dlist_t *head, dlist_node_t *new_node)
 {
-    DLIST_ASSERT(head != NULL);
-    DLIST_ASSERT(new_node != NULL);
-    DLIST_ASSERT(new_node != head);
-    DLIST_ASSERT(new_node != head->next);
-    DLIST_ASSERT(dlist_node_is_detached(new_node));
+    OS_DIAG_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(new_node != NULL);
+    OS_DIAG_ASSERT(new_node != head);
+    OS_DIAG_ASSERT(new_node != head->next);
+    OS_DIAG_ASSERT(dlist_node_is_detached(new_node));
     dlist_diagnostic_check_links(head, head->next);
 
     head->next->prev = new_node;
@@ -345,11 +335,11 @@ static inline void dlist_push_front(dlist_t *head, dlist_node_t *new_node)
  */
 static inline void dlist_push_back(dlist_t *head, dlist_node_t *new_node)
 {
-    DLIST_ASSERT(head != NULL);
-    DLIST_ASSERT(new_node != NULL);
-    DLIST_ASSERT(new_node != head->prev);
-    DLIST_ASSERT(new_node != head);
-    DLIST_ASSERT(dlist_node_is_detached(new_node));
+    OS_DIAG_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(new_node != NULL);
+    OS_DIAG_ASSERT(new_node != head->prev);
+    OS_DIAG_ASSERT(new_node != head);
+    OS_DIAG_ASSERT(dlist_node_is_detached(new_node));
     dlist_diagnostic_check_links(head->prev, head);
 
     head->prev->next = new_node;
@@ -369,11 +359,11 @@ static inline void dlist_push_back(dlist_t *head, dlist_node_t *new_node)
  */
 static inline void dlist_insert_after(dlist_node_t *pos, dlist_node_t *new_node)
 {
-    DLIST_ASSERT(pos != NULL);
-    DLIST_ASSERT(new_node != NULL);
-    DLIST_ASSERT(new_node != pos);
-    DLIST_ASSERT(new_node != pos->next);
-    DLIST_ASSERT(dlist_node_is_detached(new_node));
+    OS_DIAG_ASSERT(pos != NULL);
+    OS_DIAG_ASSERT(new_node != NULL);
+    OS_DIAG_ASSERT(new_node != pos);
+    OS_DIAG_ASSERT(new_node != pos->next);
+    OS_DIAG_ASSERT(dlist_node_is_detached(new_node));
     dlist_diagnostic_check_links(pos, pos->next);
 
     pos->next->prev = new_node;
@@ -393,11 +383,11 @@ static inline void dlist_insert_after(dlist_node_t *pos, dlist_node_t *new_node)
  */
 static inline void dlist_insert_before(dlist_node_t *pos, dlist_node_t *new_node)
 {
-    DLIST_ASSERT(pos != NULL);
-    DLIST_ASSERT(new_node != NULL);
-    DLIST_ASSERT(new_node != pos->prev);
-    DLIST_ASSERT(new_node != pos);
-    DLIST_ASSERT(dlist_node_is_detached(new_node));
+    OS_DIAG_ASSERT(pos != NULL);
+    OS_DIAG_ASSERT(new_node != NULL);
+    OS_DIAG_ASSERT(new_node != pos->prev);
+    OS_DIAG_ASSERT(new_node != pos);
+    OS_DIAG_ASSERT(dlist_node_is_detached(new_node));
     dlist_diagnostic_check_links(pos->prev, pos);
 
     pos->prev->next = new_node;
@@ -438,7 +428,7 @@ static inline dlist_node_t *dlist_pop_front(dlist_t *head)
 {
     dlist_node_t *node;
 
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     if (dlist_empty(head)) {
         return NULL;
     }
@@ -461,7 +451,7 @@ static inline dlist_node_t *dlist_pop_back(dlist_t *head)
 {
     dlist_node_t *node;
 
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     if (dlist_empty(head)) {
         return NULL;
     }
@@ -484,7 +474,7 @@ static inline size_t dlist_count(const dlist_t *head)
     const dlist_node_t *node;
     size_t count = 0;
 
-    DLIST_ASSERT(head != NULL);
+    OS_DIAG_ASSERT(head != NULL);
     for (node = head->next; node != head; node = node->next) {
         count++;
     }

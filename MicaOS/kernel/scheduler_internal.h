@@ -1,7 +1,7 @@
 #ifndef SCHEDULER_INTERNAL_H
 #define SCHEDULER_INTERNAL_H
 
-#include "kernel_config.h"
+#include "config.h"
 #include "scheduler.h"
 
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "kernel_config.h"
+#include "config.h"
 #include "time.h"
 
 #if OS_TIMER_ENABLE

@@ -31,8 +31,8 @@ extern "C" {
  *     contents are overwritten after slab_free().
  *
  * Diagnostics:
- *   - Define SLAB_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
- *     ASSERT-based parameter, range, alignment, and double-free checks.
+ *   - Define OS_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
+ *     parameter, range, alignment, and double-free checks.
  *   - SLAB_ALLOC_FAILED_HOOK_ENABLE is enabled by default. When slab_alloc()
  *     runs out of objects, it calls slab_alloc_failed() so capacity problems
  *     are exposed early during development. Thus caller have no need to check
@@ -95,20 +95,6 @@ typedef struct slab {
     slist_t free_list;
 } slab_t;
 
-#ifndef SLAB_DIAGNOSTIC_ENABLE
-#define SLAB_DIAGNOSTIC_ENABLE 0
-#endif
-
-#if SLAB_DIAGNOSTIC_ENABLE
-#define SLAB_ASSERT(cond) ASSERT(cond)
-#else
-#define SLAB_ASSERT(cond) ((void)sizeof(cond))
-#endif
-
-#ifndef SLAB_ALLOC_FAILED_HOOK_ENABLE
-#define SLAB_ALLOC_FAILED_HOOK_ENABLE 1
-#endif
-
 /*
  * Declare storage for slab.
  *
@@ -142,42 +128,42 @@ __NO_RETURN void slab_alloc_failed(const slab_t *slab);
 /* Return the diagnostic name associated with slab. */
 static inline const char *slab_name(const slab_t *slab)
 {
-    SLAB_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(slab != NULL);
     return slab->name;
 }
 
 /* Return the total number of objects managed by slab. */
 static inline size_t slab_capacity(const slab_t *slab)
 {
-    SLAB_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(slab != NULL);
     return slab->block_count;
 }
 
 /* Return the number of currently free objects. */
 static inline size_t slab_free_count(const slab_t *slab)
 {
-    SLAB_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(slab != NULL);
     return slab->free_count;
 }
 
 /* Return the number of currently allocated objects. */
 static inline size_t slab_used_count(const slab_t *slab)
 {
-    SLAB_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(slab != NULL);
     return slab->block_count - slab->free_count;
 }
 
 /* Return true when every object is free. */
 static inline bool slab_is_empty(const slab_t *slab)
 {
-    SLAB_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(slab != NULL);
     return slab->free_count == slab->block_count;
 }
 
 /* Return true when no object is available for allocation. */
 static inline bool slab_is_full(const slab_t *slab)
 {
-    SLAB_ASSERT(slab != NULL);
+    OS_DIAG_ASSERT(slab != NULL);
     return slab->free_count == 0U;
 }
 

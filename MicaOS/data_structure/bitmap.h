@@ -28,8 +28,8 @@ extern "C" {
  *   - The bitmap never allocates memory. Storage lifetime is owned by the caller.
  *   - Parameter validity is not checked by default; callers must satisfy API
  *     preconditions.
- *   - Define BITMAP_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
- *     ASSERT-based parameter and bounds checks.
+ *   - Define OS_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
+ *     parameter and bounds checks.
  *   - Bits are indexed from 0. The first bit is the least significant bit of
  *     words[0].
  *   - Tail bits beyond bit_count in the final word are ignored by query APIs.
@@ -91,16 +91,6 @@ typedef struct bitmap {
     uint32_t bit_count;
 } bitmap_t;
 
-#ifndef BITMAP_DIAGNOSTIC_ENABLE
-#define BITMAP_DIAGNOSTIC_ENABLE 0
-#endif
-
-#if BITMAP_DIAGNOSTIC_ENABLE
-#define BITMAP_ASSERT(cond) ASSERT(cond)
-#else
-#define BITMAP_ASSERT(cond) ((void)sizeof(cond))
-#endif
-
 /*
  * Internal helper: return how many bitmap_word_t elements are needed to store
  * bit_count bits.
@@ -160,7 +150,7 @@ static inline bitmap_word_t bitmap_tail_mask_(uint32_t bit_count)
 
 static inline uint32_t bitmap_ctz_(bitmap_word_t word)
 {
-    BITMAP_ASSERT(word != 0U);
+    OS_DIAG_ASSERT(word != 0U);
 #if defined(__GNUC__) || defined(__clang__)
     return (uint32_t)__builtin_ctz((unsigned int)word);
 #else
@@ -207,8 +197,8 @@ static inline void bitmap_clear_all(bitmap_t *bm)
     uint32_t word_count;
     uint32_t i;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
 
     word_count = bitmap_word_count_(bm->bit_count);
     for (i = 0; i < word_count; i++) {
@@ -222,8 +212,8 @@ static inline void bitmap_set_all(bitmap_t *bm)
     uint32_t word_count;
     uint32_t i;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
 
     word_count = bitmap_word_count_(bm->bit_count);
     for (i = 0; i < word_count; i++) {
@@ -239,8 +229,8 @@ static inline void bitmap_init(bitmap_t *bm,
                                bitmap_word_t *words,
                                uint32_t bit_count)
 {
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT((words != NULL) || (bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT((words != NULL) || (bit_count == 0U));
 
     bm->words = words;
     bm->bit_count = bit_count;
@@ -250,7 +240,7 @@ static inline void bitmap_init(bitmap_t *bm,
 /* Return the number of valid bits managed by bm. */
 static inline uint32_t bitmap_bit_count(const bitmap_t *bm)
 {
-    BITMAP_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bm != NULL);
     return bm->bit_count;
 }
 
@@ -261,9 +251,9 @@ static inline uint32_t bitmap_bit_count(const bitmap_t *bm)
  */
 static inline void bitmap_set(bitmap_t *bm, uint32_t bit)
 {
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT(bm->words != NULL);
-    BITMAP_ASSERT(bit < bm->bit_count);
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bm->words != NULL);
+    OS_DIAG_ASSERT(bit < bm->bit_count);
 
     bm->words[bitmap_word_index_(bit)] |= bitmap_bit_mask_(bit);
 }
@@ -275,9 +265,9 @@ static inline void bitmap_set(bitmap_t *bm, uint32_t bit)
  */
 static inline void bitmap_clear(bitmap_t *bm, uint32_t bit)
 {
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT(bm->words != NULL);
-    BITMAP_ASSERT(bit < bm->bit_count);
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bm->words != NULL);
+    OS_DIAG_ASSERT(bit < bm->bit_count);
 
     bm->words[bitmap_word_index_(bit)] &= ~bitmap_bit_mask_(bit);
 }
@@ -289,9 +279,9 @@ static inline void bitmap_clear(bitmap_t *bm, uint32_t bit)
  */
 static inline bool bitmap_test(const bitmap_t *bm, uint32_t bit)
 {
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT(bm->words != NULL);
-    BITMAP_ASSERT(bit < bm->bit_count);
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bm->words != NULL);
+    OS_DIAG_ASSERT(bit < bm->bit_count);
 
     return (bm->words[bitmap_word_index_(bit)] & bitmap_bit_mask_(bit)) != 0U;
 }
@@ -307,9 +297,9 @@ static inline bool bitmap_test_and_set(bitmap_t *bm, uint32_t bit)
     bitmap_word_t *word;
     bool was_set;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT(bm->words != NULL);
-    BITMAP_ASSERT(bit < bm->bit_count);
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bm->words != NULL);
+    OS_DIAG_ASSERT(bit < bm->bit_count);
 
     word = &bm->words[bitmap_word_index_(bit)];
     mask = bitmap_bit_mask_(bit);
@@ -329,9 +319,9 @@ static inline bool bitmap_test_and_clear(bitmap_t *bm, uint32_t bit)
     bitmap_word_t *word;
     bool was_set;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT(bm->words != NULL);
-    BITMAP_ASSERT(bit < bm->bit_count);
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bm->words != NULL);
+    OS_DIAG_ASSERT(bit < bm->bit_count);
 
     word = &bm->words[bitmap_word_index_(bit)];
     mask = bitmap_bit_mask_(bit);
@@ -346,8 +336,8 @@ static inline bool bitmap_is_empty(const bitmap_t *bm)
     uint32_t word_count;
     uint32_t i;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
 
     word_count = bitmap_word_count_(bm->bit_count);
     for (i = 0; i < word_count; i++) {
@@ -371,8 +361,8 @@ static inline bool bitmap_is_full(const bitmap_t *bm)
     uint32_t word_count;
     uint32_t i;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
 
     word_count = bitmap_word_count_(bm->bit_count);
     for (i = 0; i < word_count; i++) {
@@ -403,8 +393,8 @@ static inline uint32_t bitmap_count(const bitmap_t *bm)
     uint32_t i;
     uint32_t count = 0;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
 
     word_count = bitmap_word_count_(bm->bit_count);
     for (i = 0; i < word_count; i++) {
@@ -431,9 +421,9 @@ static inline bool bitmap_find_first_set(const bitmap_t *bm, uint32_t *bit)
     uint32_t word_count;
     uint32_t i;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT(bit != NULL);
-    BITMAP_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bit != NULL);
+    OS_DIAG_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
 
     word_count = bitmap_word_count_(bm->bit_count);
     for (i = 0; i < word_count; i++) {
@@ -463,9 +453,9 @@ static inline bool bitmap_find_first_zero(const bitmap_t *bm, uint32_t *bit)
     uint32_t word_count;
     uint32_t i;
 
-    BITMAP_ASSERT(bm != NULL);
-    BITMAP_ASSERT(bit != NULL);
-    BITMAP_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
+    OS_DIAG_ASSERT(bm != NULL);
+    OS_DIAG_ASSERT(bit != NULL);
+    OS_DIAG_ASSERT((bm->words != NULL) || (bm->bit_count == 0U));
 
     word_count = bitmap_word_count_(bm->bit_count);
     for (i = 0; i < word_count; i++) {

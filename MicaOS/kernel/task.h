@@ -13,7 +13,7 @@ extern "C" {
 #include "common/compiler.h"
 #include "common/assert.h"
 #include "data_structure/dlist.h"
-#include "kernel_config.h"
+#include "config.h"
 #include "time.h"
 
 /*
@@ -189,35 +189,35 @@ __NO_RETURN void task_exit(void);
 /* Return true when task has been initialized but not yet scheduled. */
 static inline bool task_is_created(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
     return task->state == TASK_STATE_CREATED;
 }
 
 /* Return true when task is ready to run. */
 static inline bool task_is_ready(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
     return task->state == TASK_STATE_READY;
 }
 
 /* Return true when task is the currently running task. */
 static inline bool task_is_running(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
     return task->state == TASK_STATE_RUNNING;
 }
 
 /* Return true when task is waiting for a future wake event. */
 static inline bool task_is_blocked(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
     return task->state == TASK_STATE_BLOCKED;
 }
 
 /* Return true when task has exited. */
 static inline bool task_is_terminated(const task_t *task)
 {
-    ASSERT(task != NULL);
+    OS_ASSERT(task != NULL);
     return task->state == TASK_STATE_TERMINATED;
 }
 

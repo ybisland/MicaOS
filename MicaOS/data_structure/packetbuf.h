@@ -43,8 +43,8 @@ extern "C" {
  *     temporarily waste a small amount of capacity.
  *   - Parameter validity is not checked by default; callers must satisfy API
  *     preconditions.
- *   - Define PACKETBUF_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
- *     ASSERT-based parameter and state checks.
+ *   - Define OS_DIAGNOSTIC_ENABLE to 1 when debugging misuse; it enables
+ *     parameter and state checks.
  *
  * Concurrency:
  *   This module does not provide any concurrency control. Callers in multi-threaded
@@ -118,16 +118,6 @@ typedef struct packetbuf {
     uint32_t put_claim_size;
 } packetbuf_t;
 
-#ifndef PACKETBUF_DIAGNOSTIC_ENABLE
-#define PACKETBUF_DIAGNOSTIC_ENABLE 0
-#endif
-
-#if PACKETBUF_DIAGNOSTIC_ENABLE
-#define PACKETBUF_ASSERT(cond) ASSERT(cond)
-#else
-#define PACKETBUF_ASSERT(cond) ((void)sizeof(cond))
-#endif
-
 /*
  * Static initializer.
  *
@@ -153,28 +143,28 @@ void packetbuf_reset(packetbuf_t *pb);
 /* Return the raw storage capacity in bytes. */
 static inline uint32_t packetbuf_capacity(const packetbuf_t *pb)
 {
-    PACKETBUF_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
     return pb->size;
 }
 
 /* Return occupied bytes, including internal packet headers and padding. */
 static inline uint32_t packetbuf_size(const packetbuf_t *pb)
 {
-    PACKETBUF_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
     return pb->write - pb->read;
 }
 
 /* Return free raw storage bytes. */
 static inline uint32_t packetbuf_space(const packetbuf_t *pb)
 {
-    PACKETBUF_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
     return pb->size - (pb->write - pb->read);
 }
 
 /* Return true when no committed packet is available. */
 static inline bool packetbuf_is_empty(const packetbuf_t *pb)
 {
-    PACKETBUF_ASSERT(pb != NULL);
+    OS_DIAG_ASSERT(pb != NULL);
     return pb->read == pb->write;
 }
 

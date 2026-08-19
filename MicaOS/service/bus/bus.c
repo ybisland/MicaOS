@@ -7,12 +7,6 @@
 
 #define BUS_WAKE_BIT ((eventset_bits_t)0x01U)
 
-#if BUS_DIAGNOSTIC_ENABLE
-#define BUS_DIAG_ASSERT(cond) ASSERT(cond)
-#else
-#define BUS_DIAG_ASSERT(cond) ((void)0)
-#endif
-
 /* Application-provided static topology symbols. */
 extern bus_channel_t *g_bus_channels_table[];
 extern uint16_t g_bus_channels_count;
@@ -21,7 +15,7 @@ extern uint16_t g_bus_subscribers_count;
 extern bus_subscription_t g_bus_subscriptions_table[];
 extern uint16_t g_bus_subscriptions_count;
 
-#if BUS_DIAGNOSTIC_ENABLE
+#if OS_DIAGNOSTIC_ENABLE
 static bool bus_initialized_;
 #endif
 
@@ -147,7 +141,7 @@ void bus_init(void)
     uint16_t subscription_count = g_bus_subscriptions_count;
     uint16_t i;
 
-#if BUS_DIAGNOSTIC_ENABLE
+#if OS_DIAGNOSTIC_ENABLE
     bus_initialized_ = false;
 #endif
 
@@ -210,7 +204,7 @@ void bus_init(void)
         slist_push_back(&subscription->channel->subscribers, &subscription->channel_node);
     }
 
-#if BUS_DIAGNOSTIC_ENABLE
+#if OS_DIAGNOSTIC_ENABLE
     bus_initialized_ = true;
 #endif
 }
@@ -221,10 +215,12 @@ static bool bus_publish_common_(bus_channel_t *channel,
 {
     uint32_t key;
 
-    BUS_DIAG_ASSERT((channel != NULL) &&
-                    (payload != NULL) &&
-                    !arch_in_isr() &&
-                    bus_initialized_);
+#if OS_DIAGNOSTIC_ENABLE
+    OS_DIAG_ASSERT((channel != NULL) &&
+                       (payload != NULL) &&
+                       !arch_in_isr() &&
+                       bus_initialized_);
+#endif
 
     key = arch_irq_lock();
 
@@ -287,11 +283,13 @@ bus_channel_t *bus_subscriber_recv(bus_subscriber_t *subscriber, os_tick_t timeo
     os_tick_t wait_ticks;
     bool finite_timeout;
 
-    BUS_DIAG_ASSERT((subscriber != NULL) &&
-                    !arch_in_isr() &&
-                    bus_initialized_ &&
-                    ((timeout == OS_WAIT_FOREVER) ||
-                     (timeout <= OS_TICK_MAX_DELAY)));
+#if OS_DIAGNOSTIC_ENABLE
+    OS_DIAG_ASSERT((subscriber != NULL) &&
+                       !arch_in_isr() &&
+                       bus_initialized_ &&
+                       ((timeout == OS_WAIT_FOREVER) ||
+                        (timeout <= OS_TICK_MAX_DELAY)));
+#endif
 
     finite_timeout = (timeout != OS_NO_WAIT) && (timeout != OS_WAIT_FOREVER);
     if (finite_timeout) {
@@ -357,20 +355,22 @@ bool bus_event_read(bus_subscriber_t *subscriber,
     uint16_t index;
     bus_event_meta_t_ *meta;
 
-    BUS_DIAG_ASSERT((subscriber != NULL) &&
-                    (channel != NULL) &&
-                    (payload_out != NULL) &&
-                    !arch_in_isr() &&
-                    bus_initialized_ &&
-                    (channel->type == BUS_CHANNEL_EVENT));
+#if OS_DIAGNOSTIC_ENABLE
+    OS_DIAG_ASSERT((subscriber != NULL) &&
+                       (channel != NULL) &&
+                       (payload_out != NULL) &&
+                       !arch_in_isr() &&
+                       bus_initialized_ &&
+                       (channel->type == BUS_CHANNEL_EVENT));
+#endif
 
     key = arch_irq_lock();
 
     subscription = bus_find_subscription_(subscriber, channel);
     if (subscription == NULL) {
         arch_irq_unlock(key);
-#if BUS_DIAGNOSTIC_ENABLE
-        BUS_DIAG_ASSERT(false);
+#if OS_DIAGNOSTIC_ENABLE
+        OS_DIAG_ASSERT(false);
 #endif
         return false;
     }
@@ -423,20 +423,22 @@ bool bus_state_read(bus_subscriber_t *subscriber,
     bus_subscription_t *subscription;
     uint32_t generation;
 
-    BUS_DIAG_ASSERT((subscriber != NULL) &&
-                    (channel != NULL) &&
-                    (latest_out != NULL) &&
-                    !arch_in_isr() &&
-                    bus_initialized_ &&
-                    (channel->type == BUS_CHANNEL_STATE));
+#if OS_DIAGNOSTIC_ENABLE
+    OS_DIAG_ASSERT((subscriber != NULL) &&
+                       (channel != NULL) &&
+                       (latest_out != NULL) &&
+                       !arch_in_isr() &&
+                       bus_initialized_ &&
+                       (channel->type == BUS_CHANNEL_STATE));
+#endif
 
     key = arch_irq_lock();
 
     subscription = bus_find_subscription_(subscriber, channel);
     if (subscription == NULL) {
         arch_irq_unlock(key);
-#if BUS_DIAGNOSTIC_ENABLE
-        BUS_DIAG_ASSERT(false);
+#if OS_DIAGNOSTIC_ENABLE
+        OS_DIAG_ASSERT(false);
 #endif
         return false;
     }
@@ -465,7 +467,7 @@ __WEAK void bus_on_publish_fail(bus_channel_t *channel)
     (void)channel;
 
 #ifndef NDEBUG
-    ASSERT(false);
+    OS_ASSERT(false);
     for (;;) {
     }
 #endif
