@@ -77,7 +77,7 @@ uint32_t *arch_context_init(void *stack,
 
     static_assert(sizeof(uint32_t) == sizeof(uintptr_t), "ARMv6-M requires 32-bit pointers");
     OS_ASSERT((stack != NULL) && (entry != NULL) && (exit != NULL));
-    OS_ASSERT((((uintptr_t)stack & (ARCH_STACK_ALIGN - 1U)) == 0U) &&     /* stack base must be 8-byte aligned. */
+    OS_ASSERT((((uintptr_t)stack & (ARCH_STACK_ALIGN - 1U)) == 0U) &&  /* stack base must be 8-byte aligned. */
            ((stack_size & (ARCH_STACK_ALIGN - 1U)) == 0U) &&           /* stack size must preserve 8-byte alignment. */
            (stack_size <= (size_t)(UINTPTR_MAX - (uintptr_t)stack)) && /* stack top address must not overflow. */
            (stack_size >= ARCH_CONTEXT_FRAME_SIZE));                   /* initial context frame must fit in the stack. */
