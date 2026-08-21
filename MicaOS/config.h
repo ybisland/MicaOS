@@ -4,9 +4,10 @@
 /*
  * MicaOS configuration
  *
- * Edit this file when integrating MicaOS without CMake, such as with Keil,
- * IAR, or another IDE-based build system. Build systems may also override
- * these macros through compiler definitions.
+ * Edit this file to configure MicaOS. CMake, Keil, IAR, and other build
+ * systems should use the same config.h so the OS behavior stays consistent.
+ * Advanced build systems may still override these macros through compiler
+ * definitions when maintaining multiple build variants.
  *
  * Conventions:
  *   - *_ENABLE options use 0 or 1.
@@ -26,6 +27,29 @@
 
 #if (ASSERT_DEBUG != 0) && (ASSERT_DEBUG != 1)
 #error "ASSERT_DEBUG must be 0 or 1"
+#endif
+
+/* Architecture port ------------------------------------------------------- */
+
+/*
+ * Select the architecture context-switch port.
+ *
+ * Build systems may add all arch_context.c files; only the selected port emits
+ * code. This option does not replace the compiler CPU/FPU flags. For example,
+ * ARMv7M_FPU still requires a hard-float build configuration.
+ */
+#define MICAOS_ARCH_PORT_ARMV6M      1U
+#define MICAOS_ARCH_PORT_ARMV7M      2U
+#define MICAOS_ARCH_PORT_ARMV7M_FPU  3U
+
+#ifndef MICAOS_ARCH_PORT
+#define MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M
+#endif
+
+#if (MICAOS_ARCH_PORT != MICAOS_ARCH_PORT_ARMV6M) && \
+    (MICAOS_ARCH_PORT != MICAOS_ARCH_PORT_ARMV7M) && \
+    (MICAOS_ARCH_PORT != MICAOS_ARCH_PORT_ARMV7M_FPU)
+#error "MICAOS_ARCH_PORT must select a valid architecture port"
 #endif
 
 /* Kernel scheduler -------------------------------------------------------- */

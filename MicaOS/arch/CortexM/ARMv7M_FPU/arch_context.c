@@ -1,3 +1,7 @@
+#include "config.h"
+
+#if MICAOS_ARCH_PORT == MICAOS_ARCH_PORT_ARMV7M_FPU
+
 #include "arch/arch_context.h"
 #include "kernel/scheduler_internal.h"
 #include "common/assert.h"
@@ -251,3 +255,5 @@ bool arch_in_isr(void)
 
     return ipsr != 0U;
 }
+
+#endif /* MICAOS_ARCH_PORT == MICAOS_ARCH_PORT_ARMV7M_FPU */

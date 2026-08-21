@@ -22,8 +22,8 @@ extern "C" {
  * Lightweight software timer driven by os_tick_advance(). Storage is provided
  * by the caller; this module does not allocate memory.
  *
- * This module is optional. Define OS_TIMER_ENABLE to 1 from the build system
- * so all kernel source files see the same setting.
+ * This module is optional. Set OS_TIMER_ENABLE to 1 in config.h so all MicaOS
+ * source files see the same setting.
  *
  * Usage:
  *   1. Allocate one soft_timer_t for each timer.

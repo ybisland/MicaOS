@@ -30,22 +30,23 @@ MicaOS 面向低成本 32 位 MCU，核心目标是简单、静态、可预测�
 
 ### 内核配置
 
-MicaOS 全局配置集中在 `config.h`。项目可以直接修改该文件，也可以通过构建选项统一覆盖这些宏，确保所有 MicaOS 源码看到同一份配置。
+MicaOS 全局配置集中在 `config.h`，直接修改该文件以适应项目配置。
 
 常用配置：
 
 ```c
+#define MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M
 #define SCHED_PRIORITY_LEVELS 8U
 #define SCHED_IDLE_STACK_SIZE 128U
 #define OS_TIMER_ENABLE 0
 #define OS_DIAGNOSTIC_ENABLE 0
 #define TASK_STACK_WATERMARK_ENABLE 0
-#define TASK_STACK_FILL_PATTERN 0xA5U
 #define OS_TRACE_ENABLE 0
 ```
 
 含义：
 
+- `MICAOS_ARCH_PORT`：选择架构。
 - `SCHED_PRIORITY_LEVELS`：任务优先级数量，范围是 1..32。数字越小优先级越高。
 - `SCHED_IDLE_STACK_SIZE`：OS 内部 idle task 的栈大小，单位是字节，必须 8 字节对齐。
 - `OS_TIMER_ENABLE`：是否启用 soft timer。默认关闭，让 `os_tick_advance()` 保持短小。
@@ -54,12 +55,8 @@ MicaOS 全局配置集中在 `config.h`。项目可以直接修改该文件，�
 - `TASK_STACK_FILL_PATTERN`：栈水位估算使用的填充值，默认 `0xA5`。
 - `OS_TRACE_ENABLE`：是否启用通用 trace hook。默认关闭。
 
-推荐通过编译选项覆盖，例如：
-
-```c
--DSCHED_PRIORITY_LEVELS=16U
--DOS_TIMER_ENABLE=1
-```
+如果同一个工程同时维护多套构建配置，也可以用编译选项覆盖 `config.h` 中的 `#ifndef` 默认值；
+但需要确保所有 MicaOS 源文件看到完全相同的配置。
 
 ### 创建任务
 
@@ -251,13 +248,11 @@ if (os_tick_after_eq(os_tick_get(), deadline)) {
 soft timer 是由 OS tick 驱动的软件定时器。它适合周期性触发小动作，或者在超时后通知某个任务继续处理。
 timer 对象由用户静态分配，内部不使用动态内存。
 
-soft timer 默认关闭，以保持 `os_tick_advance()` 尽量短小。需要使用时，通过构建选项统一定义：
+soft timer 默认关闭，以保持 `os_tick_advance()` 尽量短小。需要使用时，在 `config.h` 中开启：
 
 ```c
 #define OS_TIMER_ENABLE 1
 ```
-
-这个宏必须对内核源码也生效，推荐使用编译选项 `-DOS_TIMER_ENABLE=1`。
 
 开启后，`kernel.h` 会包含 `timer.h`，`os_tick_advance()` 也会处理到期 timer。
 
@@ -1075,17 +1070,18 @@ hook 必须短小、非阻塞，不能调用会阻塞的内核 API，也不应�
 ## 架构层和移植说明
 
 架构层负责上下文切换、中断锁、idle wait 和 ISR 检测。普通用户通常不需要直接调用架构层 API；
-把 MicaOS 接入一个 MCU 工程时，只需要选择正确的架构端口、接入 PendSV 和系统 tick。
+把 MicaOS 接入一个 MCU 工程时，只需要选择正确的架构和配置系统 tick。
 
 完整步骤见 `porting_guide.md`。
 
-当前 Cortex-M 端口：
+当前支持架构：
 
 - `ARMv6M`：Cortex-M0/M0+
-- `ARMv7M`：Cortex-M3/M4/M7 整数上下文端口
-- `ARMv7M_FPU`：Cortex-M4F/M7 硬件 FPU 端口
+- `ARMv7M`：Cortex-M3/M4/M7 无硬件FPU
+- `ARMv7M_FPU`：Cortex-M4F/M7 硬件 FPU
 
-最终工程中只应该编译一个架构实现。
+架构由 `config.h` 中的 `MICAOS_ARCH_PORT` 选择。构建系统可以加入全部 Cortex-M 架构文件（arch_context.c），
+也可以只加入当前配置对应的架构文件。
 
 ## 进阶：内部等待模型
 

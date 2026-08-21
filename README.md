@@ -19,6 +19,27 @@ MicaOS 是一个面向低成本 32 位 MCU 的小型静态 OS。它不依赖动�
 3. `docs/message-bus-guide.md`：Event/State Bus 的静态发布订阅用法。
 4. 各模块头文件：查看更精确的参数约束和模块级说明。
 
+## 构建方式
+
+MicaOS 支持两种集成方式：
+
+1. CMake：把 `MicaOS/` 作为子目录加入用户工程。
+
+    ```cmake
+    add_subdirectory(path/to/MicaOS)
+    target_link_libraries(app PRIVATE MicaOS::micaos)
+    ```
+
+2. 手动工程：Keil、IAR 或其他 IDE 工程中手动加入 MicaOS `.c` 文件。
+
+两种方式都使用同一个配置文件：
+
+```text
+MicaOS/config.h
+```
+
+用户通过 `config.h` 选择架构端口、timer、trace、诊断等选项。CMake 脚本只负责加入源码和头文件路径，不单独维护另一套 OS 配置。
+
 ## 资源占用
 
 测试环境：
@@ -44,5 +65,4 @@ MicaOS 是一个面向低成本 32 位 MCU 的小型静态 OS。它不依赖动�
 
 ## TODO
 - 支持更多Trace Backend
-- CMAKE
 - Skills

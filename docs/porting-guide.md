@@ -9,10 +9,10 @@
 把 MicaOS 接入一个工程时，通常只需要完成下面几件事：
 
 1. 把 `MicaOS/` 加入头文件搜索路径。
-2. 根据目标 CPU 选择并编译一个架构端口。
-3. 确保 `PendSV_Handler` 使用 MicaOS 提供的实现。
-4. 在系统 tick 中断里调用 `os_tick_advance()`。
-5. 配置 `config.h` 里的 MicaOS 选项。
+2. 配置 `MicaOS/config.h`，包括目标架构端口和需要启用的功能。
+3. 用 CMake 或手动工程加入 MicaOS 源文件。
+4. 确保 `PendSV_Handler` 使用 MicaOS 提供的实现。
+5. 在系统 tick 中断里调用 `os_tick_advance()`。
 6. 创建任务、加入调度器、调用 `scheduler_start()`。
 
 普通应用代码不需要直接调用 `arch_context_init()`、`arch_context_start()` 或其他架构层函数。这些接口由 task 和 scheduler 模块内部使用。
@@ -40,15 +40,26 @@
 
 ## 选择架构端口
 
-最终工程中只应该编译一个 `arch_context.c`。当前 Cortex-M 端口的选择规则如下：
+在 `MicaOS/config.h` 中配置 `MICAOS_ARCH_PORT`：
 
-| 目标 CPU | 建议端口 |
-| --- | --- |
-| Cortex-M0 / M0+ | `arch/CortexM/ARMv6M/arch_context.c` |
-| Cortex-M3 / M4 / M7，不使用硬件 FPU ABI | `arch/CortexM/ARMv7M/arch_context.c` |
-| Cortex-M4F / M7，并且工程启用了硬件 FPU ABI | `arch/CortexM/ARMv7M_FPU/arch_context.c` |
+```c
+#define MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M
+```
+
+当前 Cortex-M 端口的选择规则如下：
+
+| 目标 CPU | 配置值 | 端口文件 |
+| --- | --- | --- |
+| Cortex-M0 / M0+ | `MICAOS_ARCH_PORT_ARMV6M` | `arch/CortexM/ARMv6M/arch_context.c` |
+| Cortex-M3 / M4 / M7，不使用硬件 FPU ABI | `MICAOS_ARCH_PORT_ARMV7M` | `arch/CortexM/ARMv7M/arch_context.c` |
+| Cortex-M4F / M7，并且工程启用了硬件 FPU ABI | `MICAOS_ARCH_PORT_ARMV7M_FPU` | `arch/CortexM/ARMv7M_FPU/arch_context.c` |
 
 注意：M4F/M7 有 FPU 硬件并不等于工程一定使用硬件 FPU ABI。只有当编译选项启用了硬件浮点调用约定时，才应该选择 `ARMv7M_FPU` 端口。否则使用普通 `ARMv7M` 端口更简单。
+
+每个架构端口文件内部都会根据 `MICAOS_ARCH_PORT` 自裁剪。因此 CMake 或 Keil/IAR 工程可以把所有
+`arch_context.c` 都加入编译，最终只有选中的端口会生成 `PendSV_Handler`、`SVC_Handler` 和上下文切换代码。
+
+如果你选择只手动加入一个 `arch_context.c`，也可以；但这个文件必须和 `MICAOS_ARCH_PORT` 保持一致。
 
 ## PendSV 接入
 
@@ -58,7 +69,7 @@ MicaOS 的 Cortex-M 端口使用 PendSV 完成上下文切换。你需要确保�
 
 - 如果启动文件里 `PendSV_Handler` 是 weak 符号，直接编译 MicaOS 的 `arch_context.c` 通常就能覆盖它。
 - 如果工程里已经有一个强定义的 `PendSV_Handler`，需要移除它，或者改成调用 MicaOS 的实现。
-- 不要同时编译多个 Cortex-M 架构端口，否则会出现重复的 `PendSV_Handler`。
+- 如果同时编译多个 Cortex-M 架构端口，必须确保 `MICAOS_ARCH_PORT` 已经正确配置。
 
 PendSV 优先级应该设为最低。当前 Cortex-M 端口会在 `arch_context_start()` 中设置 PendSV 优先级，普通用户通常不需要额外处理。
 
@@ -81,26 +92,20 @@ tick 周期由你的工程决定。常见选择是 1 ms 一次，此时 `task_de
 
 MicaOS 全局配置集中在：
 
-```c
-#include "config.h"
-```
-
-你可以用编译选项覆盖配置，例如：
-
 ```text
--DSCHED_PRIORITY_LEVELS=16U
--DOS_TIMER_ENABLE=1
--DOS_TRACE_ENABLE=1
+MicaOS/config.h
 ```
 
-也可以在工程配置头文件中定义这些宏，但要确保该配置头在所有内核头文件之前生效。
+推荐直接编辑这个文件。这样 CMake、Keil、IAR 或其他构建系统都使用同一套配置。
 
-最重要的规则是：所有 MicaOS 源文件必须看到同一套配置。不要让不同 `.c` 文件使用不同的 `OS_TIMER_ENABLE`、`SCHED_PRIORITY_LEVELS` 等值。
+最重要的规则是：所有 MicaOS 源文件必须看到同一套配置。不要让不同 `.c` 文件使用不同的
+`MICAOS_ARCH_PORT`、`OS_TIMER_ENABLE`、`SCHED_PRIORITY_LEVELS` 等值。
 
 常用配置：
 
 | 配置 | 作用 |
 | --- | --- |
+| `MICAOS_ARCH_PORT` | 选择架构上下文切换端口 |
 | `SCHED_PRIORITY_LEVELS` | 任务优先级数量，范围 `1..32`，数字越小优先级越高 |
 | `SCHED_IDLE_STACK_SIZE` | OS 内部 idle task 栈大小，单位 byte，必须 8 字节对齐 |
 | `OS_TIMER_ENABLE` | 是否启用 soft timer |
@@ -240,9 +245,24 @@ pipe_read(&pipe, buf, sizeof(buf), 10);
 
 带 timeout 的通信和同步 API 在 ISR 中只能使用 `OS_NO_WAIT`。
 
-## 编译文件建议
+## CMake 构建
 
-如果你想使用当前 kernel 的常用功能，通常编译下面这些文件：
+如果用户工程使用 CMake，可以把 MicaOS 作为一个子目录加入：
+
+```cmake
+add_subdirectory(path/to/MicaOS)
+target_link_libraries(app PRIVATE MicaOS::micaos)
+```
+
+MicaOS 的 CMakeLists 只负责加入源码和 include path，不重新定义 OS 行为选项。
+用户仍然通过 `MicaOS/config.h` 选择架构、timer、trace、诊断等配置。
+
+当前 CMakeLists 会把 MicaOS 的 `.c` 文件加入静态库，包括所有 Cortex-M 架构端口文件。
+具体哪个端口生成代码由 `MICAOS_ARCH_PORT` 决定。
+
+## 手动构建文件建议
+
+如果使用 Keil、IAR 或其他手动工程，通常把下面这些文件加入工程：
 
 ```text
 kernel/task.c
@@ -255,15 +275,22 @@ kernel/pipe.c
 kernel/trace.c
 common/assert.c
 data_structure/bytebuf.c
+data_structure/packetbuf.c
+memory/slab.c
+service/bus/bus.c
 ```
 
 `pipe` 依赖 `bytebuf.c`，所以使用 pipe 时需要把它一起加入编译。
 
-然后再加上一个架构端口，例如：
+然后加入架构端口文件。可以全部加入：
 
 ```text
 arch/CortexM/ARMv6M/arch_context.c
+arch/CortexM/ARMv7M/arch_context.c
+arch/CortexM/ARMv7M_FPU/arch_context.c
 ```
+
+也可以只加入 `MICAOS_ARCH_PORT` 对应的那个端口文件。
 
 如果启用 soft timer，还需要编译：
 
@@ -271,14 +298,7 @@ arch/CortexM/ARMv6M/arch_context.c
 kernel/timer.c
 ```
 
-`timer.c` 内部也受 `OS_TIMER_ENABLE` 保护；但从工程组织上看，启用 timer 时把它加入编译列表最清晰。
-
-如果使用 slab 或 packetbuf，再额外编译：
-
-```text
-memory/slab.c
-data_structure/packetbuf.c
-```
+`timer.c` 内部受 `OS_TIMER_ENABLE` 保护，因此一直加入编译也是安全的。
 
 header-only 模块如 `dlist.h`、`slist.h`、`bitmap.h` 不需要单独编译。
 
@@ -289,7 +309,8 @@ header-only 模块如 `dlist.h`、`slist.h`、`bitmap.h` 不需要单独编译�
 - `MicaOS/` 已加入 include path。
 - 用户代码包含 `kernel/kernel.h`。
 - 所有 MicaOS 源文件看到同一套 `config.h` 配置。
-- 只编译了一个 `arch_context.c`。
+- `MICAOS_ARCH_PORT` 已经选择正确架构。
+- 架构端口文件已经加入编译；如果只加入一个端口，它必须和 `MICAOS_ARCH_PORT` 一致。
 - 向量表中的 `PendSV_Handler` 来自 MicaOS。
 - SysTick 或其他周期中断调用了 `os_tick_advance()`。
 - 每个任务都使用用户提供的静态 `task_t` 和任务栈。
