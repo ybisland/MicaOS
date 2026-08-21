@@ -68,4 +68,4 @@ MicaOS 最低支持GNU C99，CMake 集成默认使用 GNU C11 版本。手动构
 ## TODO
 - 支持更多Trace Backend
 - 优化构建系统设计
-- Skills
+- 优化文档，增加Skills

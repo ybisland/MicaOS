@@ -9,7 +9,7 @@
 把 MicaOS 接入一个工程时，通常只需要完成下面几件事：
 
 1. 把 `MicaOS/` 加入头文件搜索路径。
-2. 配置 `MicaOS/config.h`，包括目标架构端口和需要启用的功能。
+2. 配置 `MicaOS/config.h`，包括目标架构和需要启用的功能。
 3. 用 CMake 或手动工程加入 MicaOS 源文件。
 4. 确保 `PendSV_Handler` 使用 MicaOS 提供的实现。
 5. 在系统 tick 中断里调用 `os_tick_advance()`。
@@ -50,7 +50,7 @@ MicaOS 最低支持 GNU C99，默认使用 GNU C11 版本。CMake 集成会为 `
 
 MicaOS 使用少量 GNU 风格扩展，例如 `__typeof__` 和编译器属性宏。目标编译器需要支持 GCC、Clang 或 ARM Compiler 风格的 GNU C 扩展。
 
-## 选择架构端口
+## 选择架构
 
 在 `MicaOS/config.h` 中配置 `MICAOS_ARCH_PORT`：
 
@@ -58,32 +58,32 @@ MicaOS 使用少量 GNU 风格扩展，例如 `__typeof__` 和编译器属性宏
 #define MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M
 ```
 
-当前 Cortex-M 端口的选择规则如下：
+当前 Cortex-M 的选择规则如下：
 
-| 目标 CPU | 配置值 | 端口文件 |
+| 目标 CPU | 配置值 | 文件 |
 | --- | --- | --- |
 | Cortex-M0 / M0+ | `MICAOS_ARCH_PORT_ARMV6M` | `arch/CortexM/ARMv6M/arch_context.c` |
 | Cortex-M3 / M4 / M7，不使用硬件 FPU ABI | `MICAOS_ARCH_PORT_ARMV7M` | `arch/CortexM/ARMv7M/arch_context.c` |
 | Cortex-M4F / M7，并且工程启用了硬件 FPU ABI | `MICAOS_ARCH_PORT_ARMV7M_FPU` | `arch/CortexM/ARMv7M_FPU/arch_context.c` |
 
-注意：M4F/M7 有 FPU 硬件并不等于工程一定使用硬件 FPU ABI。只有当编译选项启用了硬件浮点调用约定时，才应该选择 `ARMv7M_FPU` 端口。否则使用普通 `ARMv7M` 端口更简单。
+注意：M4F/M7 有 FPU 硬件并不等于工程一定使用硬件 FPU ABI。只有当编译选项启用了硬件浮点调用约定时，才应该选择 `ARMv7M_FPU` 。否则使用普通 `ARMv7M` 更简单。
 
-每个架构端口文件内部都会根据 `MICAOS_ARCH_PORT` 自裁剪。因此 CMake 或 Keil/IAR 工程可以把所有
-`arch_context.c` 都加入编译，最终只有选中的端口会生成 `PendSV_Handler`、`SVC_Handler` 和上下文切换代码。
+每个架构文件内部都会根据 `MICAOS_ARCH_PORT` 自裁剪。因此 CMake 或 Keil/IAR 工程可以把所有
+`arch_context.c` 都加入编译，最终只有选中的架构会生成 `PendSV_Handler`、`SVC_Handler` 和上下文切换代码。
 
 如果你选择只手动加入一个 `arch_context.c`，也可以；但这个文件必须和 `MICAOS_ARCH_PORT` 保持一致。
 
 ## PendSV 接入
 
-MicaOS 的 Cortex-M 端口使用 PendSV 完成上下文切换。你需要确保最终向量表中的 `PendSV_Handler` 来自所选择的 MicaOS 架构端口。
+MicaOS 的 Cortex-M 用 PendSV 完成上下文切换。你需要确保最终向量表中的 `PendSV_Handler` 来自所选择的 MicaOS 架构。
 
 常见情况：
 
 - 如果启动文件里 `PendSV_Handler` 是 weak 符号，直接编译 MicaOS 的 `arch_context.c` 通常就能覆盖它。
 - 如果工程里已经有一个强定义的 `PendSV_Handler`，需要移除它，或者改成调用 MicaOS 的实现。
-- 如果同时编译多个 Cortex-M 架构端口，必须确保 `MICAOS_ARCH_PORT` 已经正确配置。
+- 如果同时编译多个 Cortex-M 架构，必须确保 `MICAOS_ARCH_PORT` 已经正确配置。
 
-PendSV 优先级应该设为最低。当前 Cortex-M 端口会在 `arch_context_start()` 中设置 PendSV 优先级，普通用户通常不需要额外处理。
+PendSV 优先级应该设为最低。当前 Cortex-M 会在 `arch_context_start()` 中设置 PendSV 优先级，普通用户通常不需要额外处理。
 
 ## Tick 接入
 
@@ -117,7 +117,7 @@ MicaOS/config.h
 
 | 配置 | 作用 |
 | --- | --- |
-| `MICAOS_ARCH_PORT` | 选择架构上下文切换端口 |
+| `MICAOS_ARCH_PORT` | 选择架构 |
 | `SCHED_PRIORITY_LEVELS` | 任务优先级数量，范围 `1..32`，数字越小优先级越高 |
 | `SCHED_IDLE_STACK_SIZE` | OS 内部 idle task 栈大小，单位 byte，必须 8 字节对齐 |
 | `OS_TIMER_ENABLE` | 是否启用 soft timer |
@@ -152,7 +152,7 @@ task_init(&worker,
 
 任务栈大小需要同时容纳：
 
-- 架构端口构造的初始上下文帧
+- 架构构造的初始上下文帧
 - 任务运行时的函数调用深度
 - 中断或库函数可能带来的额外栈使用
 
@@ -269,8 +269,8 @@ target_link_libraries(app PRIVATE MicaOS::micaos)
 MicaOS 的 CMakeLists 只负责加入源码和 include path，不重新定义 OS 行为选项。
 用户仍然通过 `MicaOS/config.h` 选择架构、timer、trace、诊断等配置。
 
-当前 CMakeLists 会把 MicaOS 的 `.c` 文件加入静态库，包括所有 Cortex-M 架构端口文件。
-具体哪个端口生成代码由 `MICAOS_ARCH_PORT` 决定。
+当前 CMakeLists 会把 MicaOS 的 `.c` 文件加入静态库，包括所有 Cortex-M 架构文件。
+具体哪个架构生成代码由 `MICAOS_ARCH_PORT` 决定。
 
 ## 手动构建文件建议
 
@@ -294,7 +294,7 @@ service/bus/bus.c
 
 `pipe` 依赖 `bytebuf.c`，所以使用 pipe 时需要把它一起加入编译。
 
-然后加入架构端口文件。可以全部加入：
+然后加入架构文件。可以全部加入：
 
 ```text
 arch/CortexM/ARMv6M/arch_context.c
@@ -302,7 +302,7 @@ arch/CortexM/ARMv7M/arch_context.c
 arch/CortexM/ARMv7M_FPU/arch_context.c
 ```
 
-也可以只加入 `MICAOS_ARCH_PORT` 对应的那个端口文件。
+也可以只加入 `MICAOS_ARCH_PORT` 对应的那个文件。
 
 如果启用 soft timer，还需要编译：
 
@@ -322,7 +322,7 @@ header-only 模块如 `dlist.h`、`slist.h`、`bitmap.h` 不需要单独编译�
 - 用户代码包含 `kernel/kernel.h`。
 - 所有 MicaOS 源文件看到同一套 `config.h` 配置。
 - `MICAOS_ARCH_PORT` 已经选择正确架构。
-- 架构端口文件已经加入编译；如果只加入一个端口，它必须和 `MICAOS_ARCH_PORT` 一致。
+- 架构文件已经加入编译
 - 向量表中的 `PendSV_Handler` 来自 MicaOS。
 - SysTick 或其他周期中断调用了 `os_tick_advance()`。
 - 每个任务都使用用户提供的静态 `task_t` 和任务栈。
