@@ -38,6 +38,18 @@
 #include "memory/slab.h"
 ```
 
+## 编译器要求
+
+MicaOS 最低支持 GNU C99，默认使用 GNU C11 版本。CMake 集成会为 `MicaOS::micaos` 设置 C11，并开启 C extensions。若使用C99需要手动修改CMakeList.txt。
+
+手动集成 Keil、IAR 或其他 IDE 工程时，也需要选择等价的 GNU C11 模式。例如 GCC/Clang 工程通常使用：
+
+```text
+-std=gnu11
+```
+
+MicaOS 使用少量 GNU 风格扩展，例如 `__typeof__` 和编译器属性宏。目标编译器需要支持 GCC、Clang 或 ARM Compiler 风格的 GNU C 扩展。
+
 ## 选择架构端口
 
 在 `MicaOS/config.h` 中配置 `MICAOS_ARCH_PORT`：

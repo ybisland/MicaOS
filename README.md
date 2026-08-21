@@ -38,7 +38,9 @@ MicaOS 支持两种集成方式：
 MicaOS/config.h
 ```
 
-用户通过 `config.h` 选择架构端口、timer、trace、诊断等选项。CMake 脚本只负责加入源码和头文件路径，不单独维护另一套 OS 配置。
+用户通过 `config.h` 选择架构、timer、trace、诊断等选项。CMake 脚本只负责加入源码和头文件路径，不单独维护另一套 OS 配置。
+
+MicaOS 最低支持GNU C99，CMake 集成默认使用 GNU C11 版本。手动构建工程需要选择等价的 GNU C11 或 GNU C99 模式。CMake 集成使用 GNU C99 需要手动修改CMakeList.txt。
 
 ## 资源占用
 
@@ -65,4 +67,5 @@ MicaOS/config.h
 
 ## TODO
 - 支持更多Trace Backend
+- 优化构建系统设计
 - Skills

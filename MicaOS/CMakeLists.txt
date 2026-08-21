@@ -36,9 +36,9 @@ target_include_directories(micaos PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
-target_compile_features(micaos PUBLIC c_std_99)
+target_compile_features(micaos PUBLIC c_std_11)
 set_target_properties(micaos PROPERTIES
-    C_STANDARD 99
+    C_STANDARD 11
     C_STANDARD_REQUIRED ON
     C_EXTENSIONS ON
 )
