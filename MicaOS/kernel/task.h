@@ -153,7 +153,7 @@ void task_yield(void);
  * task_delay(0) is equivalent to task_yield(). ticks must be no larger than
  * OS_TICK_MAX_DELAY so wraparound-safe tick comparisons remain valid.
  */
-void task_delay(os_tick_t ticks);
+void task_delay(os_tick_t timeout);
 
 /*
  * Set task's pending notification flag.

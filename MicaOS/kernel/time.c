@@ -159,17 +159,17 @@ void os_tick_advance(void)
 #endif
 }
 
-void task_delay(os_tick_t ticks)
+void task_delay(os_tick_t timeout)
 {
     uint32_t key;
     task_t *current;
 
-    if (ticks == 0U) {
+    if (timeout == 0U) {
         task_yield();
         return;
     }
 
-    OS_ASSERT(!arch_in_isr() && (ticks <= OS_TICK_MAX_DELAY));
+    OS_ASSERT(!arch_in_isr() && (timeout <= OS_TICK_MAX_DELAY));
 
     key = arch_irq_lock();
 
@@ -181,7 +181,7 @@ void task_delay(os_tick_t ticks)
                    dlist_node_is_detached(&current->timeout_node));
 
     current->wait_type = TASK_WAIT_DELAY;
-    kernel_timeout_start_locked(current, ticks);
+    kernel_timeout_start_locked(current, timeout);
     scheduler_block_current_locked();
 
     arch_irq_unlock(key);
