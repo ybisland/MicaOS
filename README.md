@@ -1,71 +1,69 @@
 # MicaOS
 
-MicaOS 是一个面向低成本 32 位 MCU 的小型静态 OS。它不依赖动态内存，任务控制块、任务栈、队列缓冲区等对象都由用户提供存储。
+MicaOS is a small, static, predictable RTOS for low-resource 32-bit MCUs.
 
-## 特点
+It is designed for projects that prefer explicit static allocation, simple
+kernel behavior, and low runtime overhead over a large feature set.
 
-- 静态优先级调度：数字越小优先级越高。
-- 抢占式+协作式调度（不支持时间片轮转）。
-- 不同优先级之间支持抢占，同优先级任务协作式调度。
-- 内置 task notification、eventset、counting semaphore、msgq、SPSC pipe。
-- 可选 soft timer、trace hook、任务栈水位估算。
-- service 层提供同步 message bus，用于静态发布订阅通信。
-- 支持架构：ARMv6-M、ARMv7-M、ARMv7-M FPU。
+## Main Features
 
-## 用户文档
+- Static allocation: task control blocks, task stacks, queues, and buffers are
+  caller-owned.
+- Predictable scheduling: static priorities, higher-priority preemption,
+  equal-priority FIFO at cooperative points, and no time slicing.
+- Kernel primitives: notification, eventset, semaphore, message queue, pipe,
+  soft timer, trace hooks.
+- Common modules: slab, dlist, slist, bitmap, bytebuf, packetbuf.
+- Application service: event/state bus.
+- Cortex-M ports for ARMv6-M, ARMv7-M, and ARMv7-M hard-float builds.
 
-1. `docs/kernel-guide.md`：任务、调度、tick、同步和通信 API 的用法。
-2. `docs/porting-guide.md`：把 MicaOS 接入新的 MCU 工程。
-3. `docs/message-bus-guide.md`：Event/State Bus 的静态发布订阅用法。
-4. 各模块头文件：查看更精确的参数约束和模块级说明。
+## Current Target
 
-## 构建方式
+MicaOS currently targets 32-bit MCUs.
 
-MicaOS 支持两种集成方式：
+Verified boards so far:
 
-1. CMake：把 `MicaOS/` 作为子目录加入用户工程。
+| Board | Core | Port | Result |
+| --- | --- | --- | --- |
+| NUCLEO-F411RE | Cortex-M4 | ARMv7M | Functional and stress tested |
+| NUCLEO-F411RE | Cortex-M4F | ARMv7M_FPU | Functional and FPU stress tested |
+| STM32G070 board | Cortex-M0+ | ARMv6M | Functional and stress tested |
 
-    ```cmake
-    add_subdirectory(path/to/MicaOS)
-    target_link_libraries(app PRIVATE MicaOS::micaos)
-    ```
+## Documentation
 
-2. 手动工程：Keil、IAR 或其他 IDE 工程中手动加入 MicaOS `.c` 文件。
+Start here:
 
-两种方式都使用同一个配置文件：
+- [Documentation index](docs/index.md)
+- [Getting started](docs/getting-started.md)
+- [Configuration and build](docs/configuration-and-build.md)
+- [Kernel guide](docs/kernel-guide.md)
+- [IPC guide](docs/ipc-guide.md)
+- [Message bus guide](docs/message-bus-guide.md)
+- [Porting guide](docs/porting-guide.md)
+
+For maintainers and AI agents:
+
+- [Architecture notes](docs/architecture-notes.md)
+- [Agent notes](docs/agent-notes.md)
+- [Testing guide](docs/testing-guide.md)
+
+## Build Model
+
+Configuration is centralized in:
 
 ```text
 MicaOS/config.h
 ```
 
-用户通过 `config.h` 选择架构、timer、trace、诊断等选项。CMake 脚本只负责加入源码和头文件路径，不单独维护另一套 OS 配置。
+MicaOS can be built either by CMake or by manually adding source files to
+Keil, IAR, STM32CubeIDE, Makefile, or another build system.
 
-MicaOS 最低支持GNU C99，CMake 集成默认使用 GNU C11 版本。手动构建工程需要选择等价的 GNU C11 或 GNU C99 模式。CMake 集成使用 GNU C99 需要手动修改CMakeList.txt。
+The current minimum language mode is GNU C11. Cortex-M ports also require
+compiler support for inline assembly and common compiler attributes.
 
-## 资源占用
+For details, see [Configuration and build](docs/configuration-and-build.md).
 
-测试环境：
-- STM32G070RBTx
-- `arm-none-eabi-gcc 15.2.1`、`nano.specs`、`-g0`
-- 诊断和 trace 关闭，定义 `NDEBUG`
-
-| 优化 | 内核功能配置 | Kernel only ROM | Kernel only RAM | Kernel + bus ROM | Kernel + bus RAM |
-| --- | --- | ---: | ---: | ---: | ---: |
-| `-Os` | minimal | 4013 B | 300 B | 5087 B | 300 B |
-| `-O1` | minimal | 4895 B | 300 B | 6131 B | 300 B |
-| `-O2` | minimal | 4809 B | 300 B | 6153 B | 300 B |
-| `-Os` | timer+watermark | 4387 B | 308 B | 5461 B | 308 B |
-| `-O1` | timer+watermark | 5341 B | 308 B | 6577 B | 308 B |
-| `-O2` | timer+watermark | 5253 B | 308 B | 6597 B | 308 B |
-
-说明：
-
-- `minimal`：`OS_TIMER_ENABLE=0`，
-  `TASK_STACK_WATERMARK_ENABLE=0`。
-- `timer/watermark`：soft timer 和任务栈水位估算开启。
-- `Kernel + bus`：在 `Kernel only` 基础上加入 `service/bus/bus.c`。
-
-## TODO
-- 支持更多Trace Backend
-- 优化构建系统设计
-- 优化文档，增加Skills
+## Todo
+- switch-case coroutine
+- .clang-format
+- trace

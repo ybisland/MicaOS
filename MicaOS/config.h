@@ -4,15 +4,7 @@
 /*
  * MicaOS configuration
  *
- * Edit this file to configure MicaOS. CMake, Keil, IAR, and other build
- * systems should use the same config.h so the OS behavior stays consistent.
- * Advanced build systems may still override these macros through compiler
- * definitions when maintaining multiple build variants.
- *
- * Conventions:
- *   - *_ENABLE options use 0 or 1.
- *   - Stack sizes are in bytes.
- *   - Lower numeric priority values represent higher scheduling priorities.
+ * Edit this file to configure MicaOS.
  */
 
 /* Assertions and diagnostics ---------------------------------------------- */
@@ -31,6 +23,10 @@
 
 /* Architecture port ------------------------------------------------------- */
 
+#define MICAOS_ARCH_PORT_ARMV6M      1U
+#define MICAOS_ARCH_PORT_ARMV7M      2U
+#define MICAOS_ARCH_PORT_ARMV7M_FPU  3U
+
 /*
  * Select the architecture context-switch port.
  *
@@ -38,10 +34,6 @@
  * code. This option does not replace the compiler CPU/FPU flags. For example,
  * ARMv7M_FPU still requires a hard-float build configuration.
  */
-#define MICAOS_ARCH_PORT_ARMV6M      1U
-#define MICAOS_ARCH_PORT_ARMV7M      2U
-#define MICAOS_ARCH_PORT_ARMV7M_FPU  3U
-
 #ifndef MICAOS_ARCH_PORT
 #define MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M
 #endif
@@ -52,7 +44,7 @@
 #error "MICAOS_ARCH_PORT must select a valid architecture port"
 #endif
 
-/* Kernel scheduler -------------------------------------------------------- */
+/* Kernel ------------------------------------------------------------------ */
 
 /* Number of task priority levels. Valid range: 1..32. */
 #ifndef SCHED_PRIORITY_LEVELS
@@ -64,7 +56,7 @@
 #endif
 
 /*
- * Internal idle task stack size. Must be 8-byte aligned.
+ * Internal idle task stack size(in bytes). Must be 8-byte aligned.
  *
  * The default 128 bytes is intended for the minimal idle path only:
  * scheduler_idle_hook() waits for interrupt and does no heavy work. On the
