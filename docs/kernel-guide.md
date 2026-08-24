@@ -186,24 +186,6 @@ All time-order comparisons are valid only when the real time distance is less
 than half of the `uint32_t` counter range. This is why finite delay and timeout
 values are limited by `OS_TICK_MAX_DELAY`.
 
-### Timeout Constants
-
-Kernel blocking APIs usually have a timeout parameter `os_tick_t timeout`. The 
-timeout constants are shared by these APIs:
-
-```c
-OS_NO_WAIT
-OS_WAIT_FOREVER
-```
-
-Meaning:
-
-| Timeout | Meaning |
-| --- | --- |
-| `OS_NO_WAIT` | check once and do not block |
-| finite ticks | wait up to that many ticks |
-| `OS_WAIT_FOREVER` | wait without deadline |
-
 ## Delay and Yield
 
 API:
@@ -249,6 +231,11 @@ API:
 void task_notify(task_t *task);
 bool task_notify_wait(os_tick_t timeout);
 ```
+
+`timeout` can be:
+- `OS_NO_WAIT`: Check once and never block
+- finite tick value: Wait up to that many ticks
+- `OS_WAIT_FOREVER`: Wait without a deadline
 
 Example ISR-to-task wakeup:
 
