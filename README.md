@@ -41,11 +41,15 @@ Start here:
 - [Message bus guide](docs/message-bus-guide.md)
 - [Porting guide](docs/porting-guide.md)
 
-For maintainers and AI agents:
+For maintainers:
 
-- [Agent notes](docs/agent-notes.md) Instruction for AI agent
 - [Architecture notes](docs/architecture-notes.md)
 - [Testing guide](docs/testing-guide.md)
+
+For AI agents:
+
+- [MicaOS skill](skills/micaos/SKILL.md)
+- [MicaOS ability catalog](skills/micaos/references/micaos-ability-catalog.md)
 
 ## Build Model
 

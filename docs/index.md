@@ -4,8 +4,6 @@ Documentation Boundaries:
 
 - User guides explain what users should do.
 - Architecture notes explain why the system is designed that way.
-- Agent notes explain how future AI agents or maintainers should modify the
-  project safely.
 
 ## If You Want to Use MicaOS
 
@@ -51,7 +49,6 @@ Read:
 Read:
 
 - [Architecture notes](architecture-notes.md)
-- [Agent notes](agent-notes.md)
 
-These documents are not user guides. They explain design boundaries,
-project invariants, and safe modification rules.
+This document is not a first-use guide. It explains design boundaries, project
+invariants, and safe modification rules.

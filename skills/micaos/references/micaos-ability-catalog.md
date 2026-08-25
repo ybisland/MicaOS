@@ -1,4 +1,4 @@
-# Agent Notes
+# MicaOS Ability Catalog
 
 This document is a compact ability catalog for AI agents working with MicaOS.
 Use it to quickly decide which MicaOS capability fits a request and where to

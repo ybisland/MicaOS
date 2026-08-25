@@ -1,0 +1,4 @@
+interface:
+  display_name: "MicaOS"
+  short_description: "处理 MicaOS 嵌入式 OS 项目。"
+  default_prompt: "使用 $micaos 修改、移植、测试或解释 MicaOS 嵌入式 OS 项目。"
