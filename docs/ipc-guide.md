@@ -16,6 +16,8 @@ Finite timeout values must be no larger than `OS_TICK_MAX_DELAY`.
 
 ## ISR Rules
 
+In ISR context, only non-blocking APIs are allowed(APIs with timeout must use `OS_NO_WAIT`).
+
 Allowed from ISR:
 
 - `task_notify()`
@@ -35,8 +37,6 @@ Not allowed from ISR:
 - blocking `sem_take()`
 - blocking `msgq_send()` / `msgq_recv()`
 - blocking `pipe_write()` / `pipe_read()`
-
-In ISR context, APIs with timeout must use `OS_NO_WAIT`.
 
 ## Choosing a Primitive
 

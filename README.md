@@ -43,8 +43,8 @@ Start here:
 
 For maintainers and AI agents:
 
+- [Agent notes](docs/agent-notes.md) Instruction for AI agent
 - [Architecture notes](docs/architecture-notes.md)
-- [Agent notes](docs/agent-notes.md)
 - [Testing guide](docs/testing-guide.md)
 
 ## Build Model
