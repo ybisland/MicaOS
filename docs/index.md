@@ -32,8 +32,8 @@ Read:
 
 - [Memory and data structures](memory-and-data-structures.md)
 
-This document explains where to find slab, dlist, slist, bitmap, bytebuf, and
-packetbuf usage information.
+This document explains where to find slab, dlist, slist, bitmap, bytebuf,
+packetbuf, and coroutine usage information.
 
 ## If You Want to Debug
 

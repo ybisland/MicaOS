@@ -136,6 +136,26 @@ Use it when:
 contiguous. This can temporarily waste storage, but keeps read/write logic
 simple and predictable.
 
+## Coroutine
+
+Location:
+
+```text
+MicaOS/coroutine/coro.h
+```
+
+Lightweight stackless switch-case coroutine.
+
+Use it when:
+
+- a small state machine reads better as step-by-step code
+- the code does not need an independent task stack
+- the coroutine is driven explicitly by caller code
+
+`coro` stores only a resume state. Automatic local variables do not survive a
+yield or wait, so persistent values should be stored in the owner object. Put
+each yield/wait/restart/exit macro on its own source line.
+
 ## Choosing a Module
 
 | Need | Module |
@@ -146,6 +166,7 @@ simple and predictable.
 | Track bits or priority groups | `bitmap` |
 | SPSC byte buffer | `bytebuf` |
 | SPSC variable-size packet buffer | `packetbuf` |
+| Small stackless coroutine | `coro` |
 | Blocking fixed-size message passing | `msgq` |
 | Blocking SPSC byte stream | `pipe` |
 
