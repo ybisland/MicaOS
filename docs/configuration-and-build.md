@@ -41,20 +41,45 @@ still use `MICAOS_ARCH_PORT_ARMV7M` if the project is built with soft-float ABI.
 
 ## CMake Build
 
-From a user project:
+MicaOS is exposed as one static CMake target. From a user project:
 
 ```cmake
 add_subdirectory(path/to/MicaOS)
 target_link_libraries(app PRIVATE MicaOS::micaos)
 ```
 
-The MicaOS CMake target:
+Once the application target has been created, link it to MicaOS:
 
-- builds a static library named `micaos`
-- provides alias target `MicaOS::micaos`
-- adds `MicaOS/` as a public include path
-- adds all current MicaOS source files
-- relies on `MicaOS/config.h` for feature and architecture selection
+```cmake
+add_subdirectory(MicaOS)
+
+add_executable(app
+    main.c
+)
+
+target_link_libraries(app
+    PRIVATE
+        MicaOS::micaos
+)
+```
+
+The MicaOS target:
+
+- builds a static library named `micaos`;
+- provides alias target `MicaOS::micaos`;
+- adds `MicaOS/` as a `PUBLIC` include path;
+- adds all current MicaOS `.c` source files to the static library; and
+- requires GNU-compatible C11.
+
+The public include path means application code can use the normal MicaOS
+include paths without adding another include-directory command:
+
+```c
+#include "kernel/kernel.h"
+#include "service/bus/bus.h"
+#include "data_structure/bytebuf.h"
+```
+
 
 ## Manual Build
 

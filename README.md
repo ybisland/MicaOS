@@ -62,12 +62,23 @@ MicaOS/config.h
 MicaOS can be built either by CMake or by manually adding source files to
 Keil, IAR, STM32CubeIDE, Makefile, or another build system.
 
+For CMake projects, add MicaOS as a subdirectory and link its target:
+
+```cmake
+add_subdirectory(MicaOS)
+target_link_libraries(app PRIVATE MicaOS::micaos)
+```
+
+The target publishes the `MicaOS/` include directory, so the application can
+include headers such as `kernel/kernel.h` without adding a separate include
+path. The static library owns the current MicaOS `.c` sources; architecture and
+feature selection still comes from `MicaOS/config.h`.
+
 The current minimum language mode is GNU C11. Cortex-M ports also require
 compiler support for inline assembly and common compiler attributes.
 
 For details, see [Configuration and build](docs/configuration-and-build.md).
 
 ## Todo
-- switch-case coroutine
 - .clang-format
 - trace
