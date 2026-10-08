@@ -140,6 +140,26 @@
 #error "OS_TRACE_ENABLE must be 0 or 1"
 #endif
 
+/* State machine framework ------------------------------------------------- */
+
+/* Enable hierarchical parent states in the state machine framework. */
+#ifndef OS_SMF_ANCESTOR_ENABLE
+#define OS_SMF_ANCESTOR_ENABLE 1
+#endif
+
+#if (OS_SMF_ANCESTOR_ENABLE != 0) && (OS_SMF_ANCESTOR_ENABLE != 1)
+#error "OS_SMF_ANCESTOR_ENABLE must be 0 or 1"
+#endif
+
+/* Enable optional state/action/transition instrumentation hooks. */
+#ifndef OS_SMF_INSTRUMENTATION_ENABLE
+#define OS_SMF_INSTRUMENTATION_ENABLE 0
+#endif
+
+#if (OS_SMF_INSTRUMENTATION_ENABLE != 0) && (OS_SMF_INSTRUMENTATION_ENABLE != 1)
+#error "OS_SMF_INSTRUMENTATION_ENABLE must be 0 or 1"
+#endif
+
 /* Memory policy ----------------------------------------------------------- */
 
 #ifndef SLAB_ALLOC_FAILED_HOOK_ENABLE

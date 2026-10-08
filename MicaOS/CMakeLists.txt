@@ -25,6 +25,7 @@ target_sources(micaos PRIVATE
 
     # Application service
     service/bus/bus.c
+    service/smf/smf.c
 
     # Architecture ports. config.h selects the implementation that emits code.
     arch/CortexM/ARMv6M/arch_context.c
