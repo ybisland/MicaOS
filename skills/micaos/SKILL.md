@@ -37,8 +37,8 @@ documented in the header.
 
 ## How to Help Users Use MicaOS
 
-- Use `kernel/kernel.h` as the public kernel entry point.
-- Use `service/bus/bus.h` for the message bus service.
+- Use `micaos/kernel.h` as the public kernel entry point.
+- Use `micaos/service/bus.h` for the message bus service.
 - Do not add `trace.h` to `kernel.h` unless the trace design is explicitly
   changed.
 - Assume MicaOS uses static allocation; do not introduce dynamic allocation.

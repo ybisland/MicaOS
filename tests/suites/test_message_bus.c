@@ -1,6 +1,6 @@
 #include "tests/test.h"
 #include "tests/host/kernel_host_stub.h"
-#include "service/bus/bus.h"
+#include <micaos/service/bus.h>
 
 typedef struct test_event {
     uint32_t id;

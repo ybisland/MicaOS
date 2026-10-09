@@ -37,16 +37,16 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
-set(MICAOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../MicaOS)
+set(MICAOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../)
 
 if(NOT DEFINED MICAOS_ARCH_CONTEXT_SOURCE)
-    set(MICAOS_ARCH_CONTEXT_SOURCE ${MICAOS_ROOT}/arch/CortexM/ARMv7M/arch_context.c)
+    set(MICAOS_ARCH_CONTEXT_SOURCE ${MICAOS_ROOT}/src/arch/arch_context_armv7m.c)
 endif()
 
 if(NOT DEFINED MICAOS_ARCH_PORT)
-    if(MICAOS_ARCH_CONTEXT_SOURCE MATCHES "ARMv6M")
+    if(MICAOS_ARCH_CONTEXT_SOURCE MATCHES "arch_context_armv6m\\.c$")
         set(MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV6M)
-    elseif(MICAOS_ARCH_CONTEXT_SOURCE MATCHES "ARMv7M_FPU")
+    elseif(MICAOS_ARCH_CONTEXT_SOURCE MATCHES "arch_context_armv7m_fpu\\.c$")
         set(MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M_FPU)
     else()
         set(MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M)
@@ -80,29 +80,31 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    ${MICAOS_ROOT}/common/assert.c
-    ${MICAOS_ROOT}/data_structure/bytebuf.c
-    ${MICAOS_ROOT}/kernel/task.c
-    ${MICAOS_ROOT}/kernel/scheduler.c
-    ${MICAOS_ROOT}/kernel/time.c
-    ${MICAOS_ROOT}/kernel/eventset.c
-    ${MICAOS_ROOT}/kernel/sem.c
-    ${MICAOS_ROOT}/kernel/msgq.c
-    ${MICAOS_ROOT}/kernel/pipe.c
-    ${MICAOS_ROOT}/kernel/trace.c
-    ${MICAOS_ROOT}/service/bus/bus.c
+    ${MICAOS_ROOT}/src/common/assert.c
+    ${MICAOS_ROOT}/src/data_structure/bytebuf.c
+    ${MICAOS_ROOT}/src/kernel/task.c
+    ${MICAOS_ROOT}/src/kernel/scheduler.c
+    ${MICAOS_ROOT}/src/kernel/time.c
+    ${MICAOS_ROOT}/src/kernel/eventset.c
+    ${MICAOS_ROOT}/src/kernel/sem.c
+    ${MICAOS_ROOT}/src/kernel/msgq.c
+    ${MICAOS_ROOT}/src/kernel/pipe.c
+    ${MICAOS_ROOT}/src/kernel/trace.c
+    ${MICAOS_ROOT}/src/service/bus.c
     ${MICAOS_ARCH_CONTEXT_SOURCE}
 )
 
 if(MICAOS_TIMER_ENABLE)
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-        ${MICAOS_ROOT}/kernel/timer.c
+        ${MICAOS_ROOT}/src/kernel/timer.c
     )
 endif()
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-    ${MICAOS_ROOT}
+    ${MICAOS_ROOT}/include
+    ${MICAOS_ROOT}/config
+    ${MICAOS_ROOT}/src
 )
 
 # Add project symbols (macros)

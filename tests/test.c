@@ -1,6 +1,6 @@
 #include "tests/test.h"
 #include "tests/test_port.h"
-#include "common/compiler.h"
+#include <micaos/common/compiler.h>
 
 typedef struct test_runner {
     uint32_t total;

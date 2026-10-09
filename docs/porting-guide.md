@@ -4,31 +4,34 @@ This guide explains how to bring MicaOS up on a board.
 
 ## Porting Checklist
 
-1. Add `MicaOS/` to include paths.
-2. Configure `MicaOS/config.h`.
-3. Add MicaOS source files to the build.
-4. Select the correct `MICAOS_ARCH_PORT`.
-5. Make sure MicaOS provides `PendSV_Handler`.
-6. Call `os_tick_advance()` from a periodic timer interrupt.
-7. Create tasks and start the scheduler.
+1. Add `include/` to the application include path.
+2. Add `config/` to the application include path.
+3. Add `src/` while compiling MicaOS implementation files.
+4. Configure `config/micaos_config.h`.
+5. Add MicaOS source files to the build.
+6. Select the correct `MICAOS_ARCH_PORT`.
+7. Make sure MicaOS provides `PendSV_Handler`.
+8. Call `os_tick_advance()` from a periodic timer interrupt.
+9. Create tasks and start the scheduler.
 
 ## Include Path
 
 Add:
 
 ```text
-path/to/MicaOS
+path/to/micaos/include
+path/to/micaos/config
 ```
 
 Then user code can include:
 
 ```c
-#include "kernel/kernel.h"
+#include <micaos/kernel.h>
 ```
 
 ## Architecture Port
 
-Select in `MicaOS/config.h`:
+Select in `config/micaos_config.h`:
 
 ```c
 #define MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M
@@ -72,7 +75,7 @@ tick is approximately 1 ms.
 ## Minimal Board Main
 
 ```c
-#include "kernel/kernel.h"
+#include <micaos/kernel.h>
 
 static task_t worker;
 static task_stack(worker_stack, 512);
@@ -116,7 +119,7 @@ Override if needed:
 void scheduler_idle_hook(void)
 {
     feed_watchdog();
-    arch_wait_for_interrupt();
+    __WFI(); // CMSIS/platform WFI instruction
 }
 ```
 

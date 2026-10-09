@@ -21,9 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "kernel/kernel.h"
-#include "kernel/trace.h"
-#include "service/bus/bus.h"
+#include <micaos/kernel.h>
+#include <micaos/trace.h>
+#include <micaos/service/bus.h>
 #include <string.h>
 
 #ifdef MCU_TEST_FPU_STRESS

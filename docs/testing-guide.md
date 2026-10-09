@@ -103,7 +103,7 @@ Re-run MCU tests after changing:
 - timeout logic
 - IPC wait/wakeup paths
 - FPU save/restore
-- `config.h` options that affect kernel behavior
+- `micaos_config.h` options that affect kernel behavior
 - bus event/state backend
 
 PC-only tests are not enough for these areas.

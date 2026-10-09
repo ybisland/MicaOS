@@ -84,7 +84,8 @@ increase fanout and scheduling complexity.
 
 ## Architecture Ports
 
-Cortex-M ports expose the same `arch_context.h` interface.
+Cortex-M ports implement the same private `src/internal/arch/arch_context.h`
+interface.
 
 The current build model allows all arch port `.c` files to be compiled. The
 selected implementation is controlled by `MICAOS_ARCH_PORT`.

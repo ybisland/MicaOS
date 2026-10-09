@@ -2,8 +2,8 @@
 
 #include <stddef.h>
 
-#include "arch/arch_context.h"
-#include "kernel/scheduler_internal.h"
+#include "internal/arch/arch_context.h"
+#include "internal/kernel/scheduler_internal.h"
 
 static task_t *kernel_host_current_;
 static bool kernel_host_in_isr_;

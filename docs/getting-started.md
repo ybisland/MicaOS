@@ -7,7 +7,7 @@ This guide shows the smallest useful MicaOS application shape.
 Edit:
 
 ```text
-MicaOS/config.h
+config/micaos_config.h
 ```
 
 Select a MCU architecture:
@@ -28,7 +28,7 @@ Select a MCU architecture:
 It is strongly recommended that configure SysTick as 1ms period timer and call `os_tick_advance()` from the interrupt.
 
 ```c
-#include "kernel/kernel.h"
+#include <micaos/kernel.h>
 
 void SysTick_Handler(void)
 {
@@ -49,7 +49,7 @@ Override this weak hook if needed:
 void scheduler_idle_hook(void)
 {
     feed_watchdog();
-    arch_wait_for_interrupt();
+    __WFI(); // CMSIS/platform WFI instruction
 }
 ```
 

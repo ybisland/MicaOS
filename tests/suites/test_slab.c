@@ -1,7 +1,7 @@
 #define SLAB_ALLOC_FAILED_HOOK_ENABLE 0
 
 #include "tests/test.h"
-#include "memory/slab.h"
+#include <micaos/memory/slab.h>
 
 typedef struct test_slab_item {
     uint32_t id;

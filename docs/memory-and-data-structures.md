@@ -11,8 +11,8 @@ when to choose each module.
 Location:
 
 ```text
-MicaOS/memory/slab.h
-MicaOS/memory/slab.c
+include/micaos/memory/slab.h
+src/memory/slab.c
 ```
 
 Use slab when you need a fixed-size object pool:
@@ -47,7 +47,7 @@ slab_init(&request_pool,
 Location:
 
 ```text
-MicaOS/data_structure/dlist.h
+include/micaos/data_structure/dlist.h
 ```
 
 Intrusive doubly linked list.
@@ -65,7 +65,7 @@ The kernel uses dlist for ready queues, wait queues, and timeout lists.
 Location:
 
 ```text
-MicaOS/data_structure/slist.h
+include/micaos/data_structure/slist.h
 ```
 
 Intrusive singly linked list.
@@ -82,7 +82,7 @@ Use it when:
 Location:
 
 ```text
-MicaOS/data_structure/bitmap.h
+include/micaos/data_structure/bitmap.h
 ```
 
 Fixed-size bitmap helper.
@@ -100,8 +100,8 @@ The scheduler uses bitmap to find non-empty priority queues.
 Location:
 
 ```text
-MicaOS/data_structure/bytebuf.h
-MicaOS/data_structure/bytebuf.c
+include/micaos/data_structure/bytebuf.h
+src/data_structure/bytebuf.c
 ```
 
 SPSC byte ring buffer without blocking semantics.
@@ -119,8 +119,8 @@ If used from MPMC context, add your own critical section.
 Location:
 
 ```text
-MicaOS/data_structure/packetbuf.h
-MicaOS/data_structure/packetbuf.c
+include/micaos/data_structure/packetbuf.h
+src/data_structure/packetbuf.c
 ```
 
 SPSC variable-size packet buffer without blocking semantics.
@@ -141,7 +141,7 @@ simple and predictable.
 Location:
 
 ```text
-MicaOS/coroutine/coro.h
+include/micaos/coroutine/coro.h
 ```
 
 Lightweight stackless switch-case coroutine.

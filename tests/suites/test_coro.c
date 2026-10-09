@@ -1,4 +1,4 @@
-#include "coroutine/coro.h"
+#include <micaos/coroutine/coro.h>
 #include "tests/test.h"
 
 typedef struct test_counter_coro {

@@ -5,13 +5,13 @@ The MicaOS bus is an application-level publish/subscribe service.
 Include:
 
 ```c
-#include "service/bus/bus.h"
+#include <micaos/service/bus.h>
 ```
 
 Compile:
 
 ```text
-MicaOS/service/bus/bus.c
+src/service/bus.c
 ```
 
 ## When to Use Bus
@@ -95,7 +95,7 @@ app_bus.c
 #ifndef APP_BUS_H
 #define APP_BUS_H
 
-#include "service/bus/bus.h"
+#include <micaos/service/bus.h>
 
 typedef struct {
     uint8_t key;

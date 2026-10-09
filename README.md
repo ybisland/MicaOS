@@ -56,7 +56,7 @@ For AI agents:
 Configuration is centralized in:
 
 ```text
-MicaOS/config.h
+config/micaos_config.h
 ```
 
 MicaOS can be built either by CMake or by manually adding source files to
@@ -65,14 +65,21 @@ Keil, IAR, STM32CubeIDE, Makefile, or another build system.
 For CMake projects, add MicaOS as a subdirectory and link its target:
 
 ```cmake
-add_subdirectory(MicaOS)
+add_subdirectory(path/to/MicaOS)
 target_link_libraries(app PRIVATE MicaOS::micaos)
 ```
 
-The target publishes the `MicaOS/` include directory, so the application can
-include headers such as `kernel/kernel.h` without adding a separate include
-path. The static library owns the current MicaOS `.c` sources; architecture and
-feature selection still comes from `MicaOS/config.h`.
+The target publishes `include` and `config` as compile-time include paths, so
+application code can include
+the namespaced public API:
+
+```c
+#include <micaos/kernel.h>
+```
+
+The static library owns the implementation sources under `src`;
+architecture and feature selection still comes from
+`config/micaos_config.h`.
 
 The current minimum language mode is GNU C11. Cortex-M ports also require
 compiler support for inline assembly and common compiler attributes.

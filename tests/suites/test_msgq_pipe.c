@@ -1,7 +1,7 @@
 #include "tests/test.h"
 #include "tests/host/kernel_host_stub.h"
-#include "kernel/msgq.h"
-#include "kernel/pipe.h"
+#include <micaos/msgq.h>
+#include <micaos/pipe.h>
 
 #include <string.h>
 

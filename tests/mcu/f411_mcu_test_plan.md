@@ -185,7 +185,7 @@ integer/FP scheduling.
 
 Validated items:
 
-- [x] Hard-float build uses `ARMv7M_FPU/arch_context.c` and compiler flags
+- [x] Hard-float build uses `arch_context_armv7m_fpu.c` and compiler flags
       `-mfpu=fpv4-sp-d16 -mfloat-abi=hard`.
 - [x] Startup enables CP10/CP11 access before any task executes FP instructions.
 - [x] A task can execute simple floating-point arithmetic without UsageFault.
@@ -235,7 +235,7 @@ Build command:
 ```powershell
 Set-Location 'tests/mcu/NUCLEO_F411RE_cmake/Test_STM32F411'
 $toolchain = (Resolve-Path 'cmake/gcc-arm-none-eabi.cmake').Path
-$arch = (Resolve-Path '../../../../MicaOS/arch/CortexM/ARMv7M_FPU/arch_context.c').Path
+$arch = (Resolve-Path '../../../../src/arch/arch_context_armv7m_fpu.c').Path
 cmake -S . -B build/FpuStress -G Ninja `
   "-DCMAKE_TOOLCHAIN_FILE=$toolchain" `
   -DCMAKE_BUILD_TYPE=Debug `

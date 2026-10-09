@@ -1,5 +1,5 @@
 #include "tests/test.h"
-#include "data_structure/dlist.h"
+#include <micaos/data_structure/dlist.h>
 
 typedef struct test_dlist_item {
     uint32_t value;

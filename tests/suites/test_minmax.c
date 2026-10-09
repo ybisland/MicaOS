@@ -1,5 +1,5 @@
 #include "tests/test.h"
-#include "common/minmax.h"
+#include <micaos/common/minmax.h>
 
 static int next_value(int *counter, int value)
 {

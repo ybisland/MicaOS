@@ -1,5 +1,5 @@
 #include "tests/test.h"
-#include "data_structure/bitmap.h"
+#include <micaos/data_structure/bitmap.h>
 
 static void test_bitmap_init_clears_storage_and_reports_empty(void)
 {

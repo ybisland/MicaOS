@@ -22,23 +22,23 @@ MicaOS is a small static RTOS for low-resource 32-bit MCUs. It provides:
 
 | Situation | Use | Main API/Header | Detailed Document |
 | --- | --- | --- | --- |
-| Create tasks and start the OS | Kernel scheduler and task API | `kernel/kernel.h` | `docs/getting-started.md`, `docs/kernel-guide.md` |
-| Select architecture, enable features, or build the OS | Central configuration | `MicaOS/config.h` | `docs/configuration-and-build.md` |
-| Port to Cortex-M0/M0+, M3/M4/M7, or FPU targets | Architecture context port | `arch/arch_context.h` | `docs/porting-guide.md` |
-| Delay the current task or advance system time from SysTick | OS tick and delay | `kernel/time.h` through `kernel/kernel.h` | `docs/kernel-guide.md` |
-| Wake one specific task | Task notification | `kernel/task.h` through `kernel/kernel.h` | `docs/kernel-guide.md`, `docs/ipc-guide.md` |
-| Wait for bit flags from one or more producers | Event set | `kernel/eventset.h` through `kernel/kernel.h` | `docs/ipc-guide.md` |
-| Count resources or synchronize producer/consumer availability | Counting semaphore | `kernel/sem.h` through `kernel/kernel.h` | `docs/ipc-guide.md` |
-| Transfer fixed-size messages between tasks | Message queue | `kernel/msgq.h` through `kernel/kernel.h` | `docs/ipc-guide.md` |
-| Transfer a byte stream between one writer and one reader | SPSC pipe | `kernel/pipe.h` through `kernel/kernel.h` | `docs/ipc-guide.md` |
-| Run callbacks from OS tick time | Optional software timer | `kernel/timer.h` through `kernel/kernel.h` | `docs/ipc-guide.md` |
+| Create tasks and start the OS | Kernel scheduler and task API | `micaos/kernel.h` | `docs/getting-started.md`, `docs/kernel-guide.md` |
+| Select architecture, enable features, or build the OS | Central configuration | `config/micaos_config.h` | `docs/configuration-and-build.md` |
+| Port to Cortex-M0/M0+, M3/M4/M7, or FPU targets | Architecture context port | `src/internal/arch/arch_context.h` (maintainers only) | `docs/porting-guide.md` |
+| Delay the current task or advance system time from SysTick | OS tick and delay | `micaos/time.h` through `micaos/kernel.h` | `docs/kernel-guide.md` |
+| Wake one specific task | Task notification | `micaos/task.h` through `micaos/kernel.h` | `docs/kernel-guide.md`, `docs/ipc-guide.md` |
+| Wait for bit flags from one or more producers | Event set | `micaos/eventset.h` through `micaos/kernel.h` | `docs/ipc-guide.md` |
+| Count resources or synchronize producer/consumer availability | Counting semaphore | `micaos/sem.h` through `micaos/kernel.h` | `docs/ipc-guide.md` |
+| Transfer fixed-size messages between tasks | Message queue | `micaos/msgq.h` through `micaos/kernel.h` | `docs/ipc-guide.md` |
+| Transfer a byte stream between one writer and one reader | SPSC pipe | `micaos/pipe.h` through `micaos/kernel.h` | `docs/ipc-guide.md` |
+| Run callbacks from OS tick time | Optional software timer | `micaos/timer.h` through `micaos/kernel.h` | `docs/ipc-guide.md` |
 | Allocate fixed-size objects without heap | Slab allocator | `memory/slab.h` | `docs/memory-and-data-structures.md` |
 | Embed nodes in owner objects | Doubly/singly intrusive lists | `data_structure/dlist.h`, `data_structure/slist.h` | `docs/memory-and-data-structures.md` |
 | Track fixed bit sets or priority-ready state | Bitmap | `data_structure/bitmap.h` | `docs/memory-and-data-structures.md` |
 | Buffer raw bytes without kernel blocking semantics | SPSC byte ring buffer | `data_structure/bytebuf.h` | `docs/memory-and-data-structures.md` |
 | Buffer variable-size packets without kernel blocking semantics | SPSC packet buffer | `data_structure/packetbuf.h` | `docs/memory-and-data-structures.md` |
-| Decouple application modules with publish-subscribe | Message bus service | `service/bus/bus.h` | `docs/message-bus-guide.md` |
-| Diagnose API misuse, stack usage, or scheduling behavior | Assertions, diagnostics, stack watermark, trace | `config.h`, `kernel/trace.h` | `docs/debugging-guide.md` |
+| Decouple application modules with publish-subscribe | Message bus service | `micaos/service/bus.h` | `docs/message-bus-guide.md` |
+| Diagnose API misuse, stack usage, or scheduling behavior | Assertions, diagnostics, stack watermark, trace | `micaos_config.h`, `micaos/trace.h` | `docs/debugging-guide.md` |
 | Run or extend PC/MCU verification | Test suites and MCU plans | `tests/` | `docs/testing-guide.md` |
 
 ## Choosing Between Similar Abilities
@@ -87,13 +87,13 @@ This rule affects API choice:
 Kernel users include:
 
 ```c
-#include "kernel/kernel.h"
+#include <micaos/kernel.h>
 ```
 
 Bus users include:
 
 ```c
-#include "service/bus/bus.h"
+#include <micaos/service/bus.h>
 ```
 
 Do not add `trace.h` to `kernel.h` unless the trace design is explicitly

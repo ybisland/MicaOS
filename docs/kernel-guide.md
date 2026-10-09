@@ -11,13 +11,13 @@ For synchronization and data transfer primitives such as `eventset`, `sem`,
 Application code usually includes one kernel header:
 
 ```c
-#include "kernel/kernel.h"
+#include <micaos/kernel.h>
 ```
 
 A simple startup example:
 
 ```c
-#include "kernel/kernel.h"
+#include <micaos/kernel.h>
 
 static task_t worker_task;            // task control block
 static task_stack(worker_stack, 512); // task stack storage
@@ -297,8 +297,8 @@ void scheduler_idle_hook(void)
 **The default hook waits for interrupt.**
 
 If you override the hook and still want low-power idle behavior, call the
-target's WFI instruction or include `arch/arch_context.h` and call
-`arch_wait_for_interrupt()`.
+target platform's WFI instruction directly, for example CMSIS `__WFI()`.
+MicaOS does not expose its internal architecture context header for this.
 
 `SCHED_IDLE_STACK_SIZE` controls the internal idle stack size. The default is
 128 bytes and is intended for minimal idle behavior. If the hook calls HAL

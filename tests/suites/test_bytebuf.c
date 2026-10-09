@@ -1,5 +1,5 @@
 #include "tests/test.h"
-#include "data_structure/bytebuf.h"
+#include <micaos/data_structure/bytebuf.h>
 
 static void test_bytebuf_expect_bytes(const uint8_t *expected,
                                       const uint8_t *actual,

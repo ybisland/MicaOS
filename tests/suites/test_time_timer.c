@@ -1,9 +1,9 @@
 #include "tests/test.h"
 
-#include "kernel/scheduler_internal.h"
-#include "kernel/task.h"
-#include "kernel/time.h"
-#include "kernel/timer.h"
+#include "internal/kernel/scheduler_internal.h"
+#include <micaos/task.h>
+#include <micaos/time.h>
+#include <micaos/timer.h>
 #include "tests/host/kernel_host_stub.h"
 
 #if !OS_TIMER_ENABLE

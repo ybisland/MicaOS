@@ -22,7 +22,7 @@
 #include "stm32g0xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "kernel/kernel.h"
+#include <micaos/kernel.h>
 
 bool mcu_test_tick_enabled(void);
 void mcu_test_on_tick(void);

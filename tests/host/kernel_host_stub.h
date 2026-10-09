@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #endif
 
-#include "kernel/task.h"
+#include <micaos/task.h>
 
 #ifdef __cplusplus
 extern "C" {

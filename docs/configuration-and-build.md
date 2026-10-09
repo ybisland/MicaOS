@@ -3,10 +3,16 @@
 MicaOS uses one configuration file for all build systems:
 
 ```text
-MicaOS/config.h
+config/micaos_config.h
 ```
 
 Users are expected to edit this file directly.
+
+When the repository is copied to `third_part/micaos`, edit:
+
+```text
+third_part/micaos/config/micaos_config.h
+```
 
 ## Common Options
 
@@ -51,7 +57,7 @@ target_link_libraries(app PRIVATE MicaOS::micaos)
 Once the application target has been created, link it to MicaOS:
 
 ```cmake
-add_subdirectory(MicaOS)
+add_subdirectory(path/to/MicaOS)
 
 add_executable(app
     main.c
@@ -67,7 +73,9 @@ The MicaOS target:
 
 - builds a static library named `micaos`;
 - provides alias target `MicaOS::micaos`;
-- adds `MicaOS/` as a `PUBLIC` include path;
+- adds `include` as the `PUBLIC` include path;
+- adds `config` as a `PUBLIC` configuration include path;
+- keeps `src` private to the MicaOS target;
 - adds all current MicaOS `.c` source files to the static library; and
 - requires GNU-compatible C11.
 
@@ -75,9 +83,9 @@ The public include path means application code can use the normal MicaOS
 include paths without adding another include-directory command:
 
 ```c
-#include "kernel/kernel.h"
-#include "service/bus/bus.h"
-#include "data_structure/bytebuf.h"
+#include <micaos/kernel.h>
+#include <micaos/service/bus.h>
+#include <micaos/data_structure/bytebuf.h>
 ```
 
 
@@ -86,32 +94,34 @@ include paths without adding another include-directory command:
 For Keil, IAR, STM32CubeIDE, Makefile, or other systems:
 
 ```text
-1. Add MicaOS/ to the include path.
-2. Add the MicaOS .c files used by your project.
-3. Add either all arch_context.c files, or only the one selected by
+1. Add include/ to the application include path.
+2. Add config/ to the application include path.
+3. Add src/ to the include path while compiling MicaOS sources.
+4. Add the MicaOS .c files used by your project.
+5. Add either all architecture context files, or only the one selected by
    MICAOS_ARCH_PORT.
 ```
 
 Common source set:
 
 ```text
-MicaOS/common/assert.c
-MicaOS/kernel/task.c
-MicaOS/kernel/scheduler.c
-MicaOS/kernel/time.c
-MicaOS/kernel/eventset.c
-MicaOS/kernel/sem.c
-MicaOS/kernel/msgq.c
-MicaOS/kernel/pipe.c
-MicaOS/kernel/timer.c
-MicaOS/kernel/trace.c
-MicaOS/data_structure/bytebuf.c
-MicaOS/data_structure/packetbuf.c
-MicaOS/memory/slab.c
-MicaOS/service/bus/bus.c
-MicaOS/arch/CortexM/ARMv6M/arch_context.c
-MicaOS/arch/CortexM/ARMv7M/arch_context.c
-MicaOS/arch/CortexM/ARMv7M_FPU/arch_context.c
+src/common/assert.c
+src/kernel/task.c
+src/kernel/scheduler.c
+src/kernel/time.c
+src/kernel/eventset.c
+src/kernel/sem.c
+src/kernel/msgq.c
+src/kernel/pipe.c
+src/kernel/timer.c
+src/kernel/trace.c
+src/data_structure/bytebuf.c
+src/data_structure/packetbuf.c
+src/memory/slab.c
+src/service/bus.c
+src/arch/arch_context_armv6m.c
+src/arch/arch_context_armv7m.c
+src/arch/arch_context_armv7m_fpu.c
 ```
 
 `timer.c` is controlled by `OS_TIMER_ENABLE`, so it is safe to compile even

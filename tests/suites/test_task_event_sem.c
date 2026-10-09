@@ -1,9 +1,9 @@
 #include "tests/test.h"
 
 #include "tests/host/kernel_host_stub.h"
-#include "kernel/eventset.h"
-#include "kernel/sem.h"
-#include "kernel/task.h"
+#include <micaos/eventset.h>
+#include <micaos/sem.h>
+#include <micaos/task.h>
 
 static void test_task_entry_(void *arg)
 {
