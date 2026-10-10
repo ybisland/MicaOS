@@ -22,6 +22,8 @@ third_part/micaos/config/micaos_config.h
 | `SCHED_PRIORITY_LEVELS` | Number of task priority levels, valid range `1..32` |
 | `SCHED_IDLE_STACK_SIZE` | Internal idle task stack size in bytes, 8-byte aligned |
 | `OS_TIMER_ENABLE` | Enables soft timer support |
+| `CRC32_IEEE_USE_TABLE` | Enables the CRC-32/IEEE lookup table, using approximately 1 KB of ROM |
+| `CRC32_MPEG2_USE_TABLE` | Enables the CRC-32/MPEG-2 lookup table, using approximately 1 KB of ROM |
 | `ASSERT_DEBUG` | Enables assertion handling in debug builds |
 | `OS_DIAGNOSTIC_ENABLE` | Enables deeper diagnostic assertions |
 | `TASK_STACK_WATERMARK_ENABLE` | Enables task stack watermark estimation |
@@ -106,6 +108,7 @@ Common source set:
 
 ```text
 src/common/assert.c
+src/common/crc.c
 src/kernel/task.c
 src/kernel/scheduler.c
 src/kernel/time.c

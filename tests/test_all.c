@@ -15,4 +15,5 @@ void test_all_run(void)
     test_task_event_sem_run();
     test_msgq_pipe_run();
     test_message_bus_run();
+    test_crc_run();
 }

@@ -6,6 +6,7 @@ add_library(MicaOS::micaos ALIAS micaos)
 target_sources(micaos PRIVATE
     # Common implementation
     src/common/assert.c
+    src/common/crc.c
 
     # Kernel
     src/kernel/task.c

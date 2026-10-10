@@ -17,6 +17,7 @@ void test_time_timer_run(void);
 void test_task_event_sem_run(void);
 void test_msgq_pipe_run(void);
 void test_message_bus_run(void);
+void test_crc_run(void);
 
 #ifdef __cplusplus
 }

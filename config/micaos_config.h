@@ -30,9 +30,9 @@
 /*
  * Select the architecture context-switch port.
  *
- * Build systems may add all arch_context.c files; only the selected port emits
- * code. This option does not replace the compiler CPU/FPU flags. For example,
- * ARMv7M_FPU still requires a hard-float build configuration.
+ * Build systems may add all architecture context files; only the selected port
+ * emits code. This option does not replace the compiler CPU/FPU flags. For
+ * example, ARMv7M_FPU still requires a hard-float build configuration.
  */
 #ifndef MICAOS_ARCH_PORT
 #define MICAOS_ARCH_PORT MICAOS_ARCH_PORT_ARMV7M
@@ -75,6 +75,23 @@
 #endif
 
 /* Optional features ------------------------------------------------------- */
+
+/* CRC-32 lookup tables. Each enabled table occupies approximately 1 KB of ROM. */
+#ifndef CRC32_IEEE_USE_TABLE
+#define CRC32_IEEE_USE_TABLE 0
+#endif
+
+#if (CRC32_IEEE_USE_TABLE != 0) && (CRC32_IEEE_USE_TABLE != 1)
+#error "CRC32_IEEE_USE_TABLE must be 0 or 1"
+#endif
+
+#ifndef CRC32_MPEG2_USE_TABLE
+#define CRC32_MPEG2_USE_TABLE 0
+#endif
+
+#if (CRC32_MPEG2_USE_TABLE != 0) && (CRC32_MPEG2_USE_TABLE != 1)
+#error "CRC32_MPEG2_USE_TABLE must be 0 or 1"
+#endif
 
 /* Enable soft timer support. Disabled by default so os_tick_advance() stays minimal. */
 #ifndef OS_TIMER_ENABLE

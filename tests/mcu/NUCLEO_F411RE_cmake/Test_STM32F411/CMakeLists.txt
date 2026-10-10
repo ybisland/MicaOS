@@ -81,6 +81,7 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ${MICAOS_ROOT}/src/common/assert.c
+    ${MICAOS_ROOT}/src/common/crc.c
     ${MICAOS_ROOT}/src/data_structure/bytebuf.c
     ${MICAOS_ROOT}/src/kernel/task.c
     ${MICAOS_ROOT}/src/kernel/scheduler.c
