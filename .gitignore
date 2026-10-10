@@ -57,6 +57,7 @@ venv/
 *.user
 *.suo
 *.uvguix.*
+.codex/
 
 # Project-local machine configuration
 tests/local_tools.ps1
