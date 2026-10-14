@@ -372,19 +372,40 @@ uint32_t *arch_context_switch_callback(uint32_t *saved_sp)
 {
     task_t *from;
     task_t *to;
+    uint32_t *next_sp;
+    uint32_t key;
 
-    OS_DIAG_ASSERT((scheduler_.current != NULL) && (scheduler_.next != NULL));
-
+    /*
+     * PendSV can be preempted by higher-priority interrupts (for example,
+     * SysTick), which may update scheduler_.current and scheduler_.next.
+     * Keep the scheduler handoff atomic until the selected SP is captured.
+     */
+    key = arch_irq_lock();
     from = scheduler_.current;
     to = scheduler_.next;
+
+    /*
+     * SysTick may cancel a pending switch before PendSV reaches this
+     * callback. The saved context still belongs to the current task, so
+     * restore it unchanged and leave scheduler state untouched.
+     */
+    if (to == NULL) {
+        arch_irq_unlock(key);
+        return saved_sp;
+    }
+
+    OS_DIAG_ASSERT(from != NULL);
 
     from->sp = saved_sp;
     scheduler_.current = to;
     scheduler_.next = NULL;
     to->state = TASK_STATE_RUNNING;
+    next_sp = to->sp;
+    arch_irq_unlock(key);
+
 #if OS_TRACE_ENABLE
     os_trace_task_switch(from, to);
 #endif
 
-    return to->sp;
+    return next_sp;
 }
