@@ -160,21 +160,21 @@
 /* State machine framework ------------------------------------------------- */
 
 /* Enable hierarchical parent states in the state machine framework. */
-#ifndef OS_SMF_ANCESTOR_ENABLE
-#define OS_SMF_ANCESTOR_ENABLE 1
+#ifndef CONFIG_SMF_ANCESTOR_SUPPORT
+#define CONFIG_SMF_ANCESTOR_SUPPORT 1
 #endif
 
-#if (OS_SMF_ANCESTOR_ENABLE != 0) && (OS_SMF_ANCESTOR_ENABLE != 1)
-#error "OS_SMF_ANCESTOR_ENABLE must be 0 or 1"
+#if (CONFIG_SMF_ANCESTOR_SUPPORT != 0) && (CONFIG_SMF_ANCESTOR_SUPPORT != 1)
+#error "CONFIG_SMF_ANCESTOR_SUPPORT must be 0 or 1"
 #endif
 
 /* Enable optional state/action/transition instrumentation hooks. */
-#ifndef OS_SMF_INSTRUMENTATION_ENABLE
-#define OS_SMF_INSTRUMENTATION_ENABLE 0
+#ifndef CONFIG_SMF_INSTRUMENTATION
+#define CONFIG_SMF_INSTRUMENTATION 0
 #endif
 
-#if (OS_SMF_INSTRUMENTATION_ENABLE != 0) && (OS_SMF_INSTRUMENTATION_ENABLE != 1)
-#error "OS_SMF_INSTRUMENTATION_ENABLE must be 0 or 1"
+#if (CONFIG_SMF_INSTRUMENTATION != 0) && (CONFIG_SMF_INSTRUMENTATION != 1)
+#error "CONFIG_SMF_INSTRUMENTATION must be 0 or 1"
 #endif
 
 /* Memory policy ----------------------------------------------------------- */

@@ -14,6 +14,7 @@
 #define SMF_H_
 
 #include <stdint.h>
+#include <micaos_config.h>
 
 /* clang-format off */
 #if CONFIG_SMF_ANCESTOR_SUPPORT == 1
@@ -123,10 +124,10 @@ typedef struct smf_state {
      *	Note: When transitioning between two child states with a shared
      *      parent,	that parent's exit and entry functions do not execute.
      */
-    const smf_state_t *parent;
+    const struct smf_state *parent;
 
     /** Optional initial transition state. NULL for leaf states */
-    const smf_state_t *initial;
+    const struct smf_state *initial;
 #endif /* CONFIG_SMF_ANCESTOR_SUPPORT */
 
 } smf_state_t;
